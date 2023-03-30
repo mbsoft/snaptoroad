@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <!-- Include CARTO VL JS from the CARTO CDN-->
+    <script src="https://libs.cartocdn.com/carto-vl/v1.4.4/carto-vl.min.js"></script>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <!-- Include Mapbox GL from the Mapbox CDN-->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.js"></script>
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v1.0.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://carto.com/developers/carto-vl/v1.4.4/examples/maps/style.css" rel="stylesheet">
+  </head>
+
+<body>
+  <div id="map"></div>
+
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Details</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Move the mouse over the polygons</p>
+        <div id="controls">
+          <div id="content"></div>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+
+    <script src="https://maps-gl.nextbillion.io/maps/api/js"></script>
+    <!-- <script src="nextbillion.js"</script> -->
+    <script src="script.js"></script>
+  </body>
+</html>
