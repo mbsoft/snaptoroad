@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '**/*.json'  # Monitor all .json files in the repository
+  workflow_dispatch:
 
 jobs:
   upload_to_drive:
