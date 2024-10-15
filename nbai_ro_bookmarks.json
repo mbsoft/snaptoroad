@@ -1,5 +1,176 @@
 [
     {
+        "title": "Tutorials - Mixed Fleet - India",
+        "jsonObject": {
+            "locations": {
+                "id": 12,
+                "description": "Mixed Fleet - India",
+                "location": [
+                    "12.9879961308,77.5599594517",
+                    "12.9749055996,77.5694185185",
+                    "12.9569875034,77.5564476786",
+                    "12.9550388560,77.5976774424",
+                    "12.9537403284,77.5634526122",
+                    "12.9697565645,77.5916769898",
+                    "12.9721861841,77.5645390439",
+                    "12.9505428002,77.5827885502",
+                    "12.9787188966,77.5383849751",
+                    "12.9424585727,77.5979676692",
+                    "12.969582,77.586017",
+                    "12.969582,77.586017"
+                ]
+            },
+            "jobs": [
+                {
+                    "id": 1,
+                    "location_index": 0,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 2,
+                    "location_index": 1,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 3,
+                    "location_index": 2,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 4,
+                    "location_index": 3,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 6,
+                    "location_index": 5,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 7,
+                    "location_index": 6,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 8,
+                    "location_index": 7,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 9,
+                    "location_index": 8,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                },
+                {
+                    "id": 10,
+                    "location_index": 9,
+                    "service": 300,
+                    "priority": 0,
+                    "time_windows": [
+                        [
+                            1729080000,
+                            1729098000
+                        ]
+                    ]
+                }
+            ],
+            "vehicles": [
+                {
+                    "id": "1-TRUCK",
+                    "start_index": 11,
+                    "end_index": 11,
+                    "time_window": [
+                        1729080000,
+                        1729098000
+                    ],
+                    "max_tasks": 3,
+                    "breaks": [],
+                    "profile": "truck"
+                },
+                {
+                    "id": "2-CAR",
+                    "start_index": 11,
+                    "end_index": 11,
+                    "time_window": [
+                        1729080000,
+                        1729098000
+                    ],
+                    "max_tasks": 4,
+                    "breaks": [],
+                    "profile": "car"
+                }
+            ],
+            "options": {
+                "routing": {
+                    "profiles": {
+                        "truck": {
+                            "mode": "truck"
+                        },
+                        "car": {
+                            "mode": "car"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
         "title": "Tutorials - Basic Route Opt.",
         "jsonObject": {
             "description": "Basic Route Optimization Example",
