@@ -4,14 +4,31 @@
     <meta charset="utf-8">
     <title>NB.ai Route Optimization Sample Loader</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+      /* Styling for category headers */
+      .category {
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      /* Initially hide sub-items */
+      .sub-items {
+        display: none;
+        margin-left: 20px;
+      }
+
+      /* Add a little spacing between the container and button */
+      #checkbox-container {
+        margin-bottom: 15px;
+      }
+    </style>
   </head>
   <body>
     <h2>Upload NB.ai Route Optimization Bookmarks</h2>
     <input type="file" id="json-file-input" accept=".json" /><br /><br />
     
-    <div id="checkbox-container" style="margin-bottom: 15px;">
-      <input type="checkbox" id="select-all-checkbox" /> Select All<br><br>
-    </div> <!-- Container for dynamically added checkboxes -->
+    <div id="checkbox-container"></div> <!-- Container for dynamically added hierarchical checkboxes -->
 
     <button id="upload-button">Upload and Store Selected Bookmarks</button>
 

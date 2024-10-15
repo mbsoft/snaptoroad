@@ -1,4 +1,4 @@
-// Event listener to handle file selection and generate checkboxes
+// Event listener to handle file selection and generate hierarchical checkboxes
 document.getElementById('json-file-input').addEventListener('change', async (event) => {
   const fileInput = event.target;
   const file = fileInput.files[0];
@@ -21,9 +21,12 @@ document.getElementById('json-file-input').addEventListener('change', async (eve
       }
 
       const checkboxContainer = document.getElementById('checkbox-container');
-      checkboxContainer.innerHTML = '<input type="checkbox" id="select-all-checkbox" /> Select All<br><br>';  // Reset checkboxes and add "Select All"
+      checkboxContainer.innerHTML = '';  // Clear existing content
 
-      // Create a checkbox for each item in the array
+      // Create an object to store categories and their sub-items
+      const categories = {};
+
+      // Parse titles and group by categories
       jsonArray.forEach((item, index) => {
         const { title } = item;
         if (!title || !item.jsonObject) {
@@ -31,32 +34,56 @@ document.getElementById('json-file-input').addEventListener('change', async (eve
           return;
         }
 
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = `item-checkbox-${index}`;
-        checkbox.checked = false;  // Default unchecked
+        // Split the title into category and sub-item
+        const [category, subItem] = title.split(' - ');
 
-        const label = document.createElement('label');
-        label.htmlFor = `item-checkbox-${index}`;
-        label.textContent = title;
-
-        const br = document.createElement('br');
-
-        checkboxContainer.appendChild(checkbox);
-        checkboxContainer.appendChild(label);
-        checkboxContainer.appendChild(br);
-      });
-
-      // Add event listener for "Select All" checkbox
-      const selectAllCheckbox = document.getElementById('select-all-checkbox');
-      selectAllCheckbox.addEventListener('change', () => {
-        const isChecked = selectAllCheckbox.checked;
-        for (let index = 0; index < jsonArray.length; index++) {
-          const checkbox = document.getElementById(`item-checkbox-${index}`);
-          checkbox.checked = isChecked; // Set all checkboxes to match "Select All"
+        // Initialize category if not already present
+        if (!categories[category]) {
+          categories[category] = [];
         }
+
+        // Add the sub-item (or full title if no sub-item) to the category
+        categories[category].push({ index, subItem: subItem || title });
       });
-      
+
+      // Create hierarchical list
+      Object.keys(categories).forEach(category => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'category';
+        categoryDiv.textContent = category;
+
+        const subItemsDiv = document.createElement('div');
+        subItemsDiv.className = 'sub-items';
+
+        // Add each sub-item with a checkbox
+        categories[category].forEach(({ index, subItem }) => {
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.id = `item-checkbox-${index}`;
+          checkbox.checked = false;  // Default unchecked
+
+          const label = document.createElement('label');
+          label.htmlFor = `item-checkbox-${index}`;
+          label.textContent = subItem;
+
+          const br = document.createElement('br');
+
+          subItemsDiv.appendChild(checkbox);
+          subItemsDiv.appendChild(label);
+          subItemsDiv.appendChild(br);
+        });
+
+        // Toggle visibility of sub-items when clicking the category
+        categoryDiv.addEventListener('click', () => {
+          const isDisplayed = subItemsDiv.style.display === 'block';
+          subItemsDiv.style.display = isDisplayed ? 'none' : 'block';
+        });
+
+        // Append category and sub-items to the container
+        checkboxContainer.appendChild(categoryDiv);
+        checkboxContainer.appendChild(subItemsDiv);
+      });
+
     } catch (error) {
       alert("Error reading file: " + error.message);
     }
@@ -96,8 +123,8 @@ document.getElementById('upload-button').addEventListener('click', async () => {
           await storeInLocalStorage(newKey, title, jsonObject);
         }
       }
-      alert("Selected NB.ai Bookmarks Saved!");
-      
+      alert("Selected NB.ai Bookmarks Saved! Refresh browser window to view");
+
     } catch (error) {
       alert("Error reading file: " + error.message);
     }

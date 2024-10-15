@@ -1,0 +1,27 @@
+name: Upload to Google Drive on File Change
+
+on:
+  push:
+    paths:
+      - nbai_bookmarks/nbai_tutorials.json  # Specify the file you want to monitor
+
+jobs:
+  upload_to_drive:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - name: Install dependencies
+      run: npm install googleapis
+
+    - name: Upload file to Google Drive
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}  # Add your Google API credentials as a GitHub secret
+      run: node upload_to_drive.js 1HC2z9Xt2B2SpK-kh_j-z1bqL3gI-uatj
