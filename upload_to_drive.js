@@ -17,22 +17,24 @@ async function uploadFileToDrive(filePath, folderId = null) {
             name: path.basename(filePath),
         };
 
+        // Assign folder ID if provided
         if (folderId) {
             fileMetadata.parents = [folderId];
         }
 
         const media = {
-            mimeType: 'text/plain',  // Adjust MIME type according to your file
+            mimeType: 'application/json',  // Adjust mime type based on your file
             body: fs.createReadStream(filePath),
         };
 
         const response = await drive.files.create({
             resource: fileMetadata,
             media: media,
-            fields: 'id',
+            fields: 'id, parents',
         });
 
         console.log(`File uploaded successfully, File ID: ${response.data.id}`);
+        console.log(`File uploaded to folder ID: ${response.data.parents}`);
     } catch (error) {
         console.error('Error uploading file to Google Drive:', error);
     }
@@ -40,9 +42,10 @@ async function uploadFileToDrive(filePath, folderId = null) {
 
 // Process command-line arguments
 const filePath = process.argv[2];
+const folderId = process.argv[3];
 if (!filePath) {
     console.error('Please provide the path to the file to upload.');
     process.exit(1);
 }
 
-uploadFileToDrive(filePath);
+uploadFileToDrive(filePath, folderId);
