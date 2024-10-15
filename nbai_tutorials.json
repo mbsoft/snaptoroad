@@ -2260,6 +2260,170 @@
              }
            }
          }
+    },
+    {
+        "title": "Tutorials - Deports",
+        "jsonObject": {
+            "description": "Depots Example",
+            "locations": {
+                "id": 1,
+                "location": ["34.06173622,-118.32402555","34.06266790,-118.33873187","34.06871599,-118.33873626","34.06186820,-118.31180940","34.06925486,-118.32394628","34.07119806,-118.32022049","34.07119806,-118.31263094","34.05908092,-118.33498563","34.05725176,-118.33967735","34.05296453,-118.33677952","34.05833783,-118.31442483","34.05445079,-118.30952612"]
+            },
+             "depots":[
+               {
+                  "id":"depot 1",
+                  "location_index":0
+               },
+               {
+                  "id":"depot 2",
+                  "location_index":1
+               },
+                {
+                  "id":"depot 3",
+                  "location_index":2
+               },
+               {
+                  "id":"depot 4",
+                  "location_index":3
+               }
+             ],
+           
+            "jobs": [
+                {
+                    "id": "Delivery 1",
+                    "location_index": 4,
+                    "service": 300,
+                    "delivery": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 1"
+               ]
+                },
+                {
+                    "id": "Delivery 2",
+                    "location_index": 5,
+                    "service": 300,
+                    "delivery": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 2"
+               ]
+                },
+                {
+                    "id": "Delivery 3",
+                    "location_index": 6,
+                    "service": 300,
+                    "delivery": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 3"
+               ]
+                },
+                {
+                    "id": "Delivery 4",
+                    "location_index": 7,
+                    "service": 300,
+                    "delivery": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 4"
+               ]
+                },
+                {
+                    "id": "Delivery 5",
+                    "location_index": 8,
+                    "service": 300,
+                    "delivery": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 1"
+               ]
+                },
+                {
+                    "id": "Delivery 6",
+                    "location_index": 9,
+                    "service": 300,
+                    "delivery": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 2"
+               ]
+                },
+                {
+                    "id": "Pickup 1",
+                    "location_index": 10,
+                    "service": 300,
+                    "pickup": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 3"
+               ]
+                },
+                {
+                    "id": "Pickup 2",
+                    "location_index": 11,
+                    "service": 300,
+                    "pickup": [
+                        1
+                    ],
+                     "depot_ids": [
+                 "depot 4"
+               ]
+                }
+            ],
+            "vehicles": [
+                {
+                    "id": 1,
+                     "start_depot_ids": [
+                 "depot 1"
+               ],
+                    "capacity": [
+                        5
+                    ]
+                },
+                {
+                    "id": 2,
+                    "start_depot_ids": [
+                 "depot 2"
+               ],
+                    "capacity": [
+                        5
+                    ]
+             },
+             {
+                    "id": 3,
+                   
+                    "start_depot_ids": [
+                     "depot 3"
+                   ],
+                    "end_depot_ids": [
+                     "depot 3"
+                   ],
+                    "capacity": [
+                        5
+                    ]
+             },
+             {
+                    "id": 4,
+                    "start_depot_ids": [
+                     "depot 4"
+                   ],
+                    "end_depot_ids": [
+                     "depot 4"
+                   ],
+                    "capacity": [
+                        5
+                    ]
+             }
+           ]
+         }
     }
 
 ]
