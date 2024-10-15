@@ -3,8 +3,7 @@ name: Upload to Google Drive on File Change
 on:
   push:
     paths:
-      - nbai_bookmarks/nbai_tutorials.json
-  workflow_dispatch:  # Add this to allow manual triggering
+      - nbai_bookmarks/nbai_tutorials.json  # Monitor this specific file
 
 jobs:
   upload_to_drive:
@@ -12,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3  # This checks out the repository code
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
