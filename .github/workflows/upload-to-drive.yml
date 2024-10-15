@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - nbai_bookmarks/nbai_tutorials.json  # Monitor this specific file
+  workflow_dispatch:  # Add this to allow manual triggering
 
 jobs:
   upload_to_drive:
