@@ -1,0 +1,55 @@
+  
+  /* style.css */
+body {
+    width: 600px; /* Set the desired width */
+    min-width: 300px;
+    max-width: 500px;
+    height: 300px;
+    overflow: auto;
+  }
+
+  h2 {
+    font-size: 16px;
+  }
+  
+  input[type="file"] {
+    width: 100%;
+  }
+  .modal {
+    display: none; /* Hide the modal by default */
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+      /* Make sure the modal fits within the Chrome extension's popup size */
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 100%; /* Ensure the modal fits the extension popup */
+        max-width: 300px; /* Adjust based on your needs */
+        text-align: center;
+        box-sizing: border-box; /* Ensure padding doesn't break layout */
+      }
+
+
+      .modal-content img {
+        width: 50px; /* Resize the image to fit the popup */
+        height: 50px;
+      }
+
+      /* Adjust the modal to fit within the popup */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
