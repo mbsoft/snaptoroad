@@ -1,10 +1,9 @@
-name: Upload to Google Drive on File Change
+name: Upload JSON Files to Google Drive on Change
 
 on:
   push:
     paths:
-      - nbai_bookmarks/nbai_tutorials.json  # Monitor this specific file
-  workflow_dispatch:  # Add this to allow manual triggering
+      - '**/*.json'  # Monitor all .json files in the repository
 
 jobs:
   upload_to_drive:
@@ -12,17 +11,30 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3  # This checks out the repository code
+      uses: actions/checkout@v3  # Checkout the repo
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16.x'
+        node-version: '20.x'
 
     - name: Install dependencies
       run: npm install googleapis
 
+    - name: Find the modified .json file
+      id: get_changed_file
+      run: |
+        # Find the changed .json file(s) and store the first one in an environment variable
+        FILE=$(git diff --name-only --diff-filter=AM HEAD^ HEAD | grep '\.json$' | head -n 1)
+        echo "FILE_NAME=$FILE" >> $GITHUB_ENV
+
     - name: Upload file to Google Drive
       env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}  # Add your Google API credentials as a GitHub secret
-      run: node upload_to_drive.js ./nbai_bookmarks/nbai_tutorials.json 1U9MQkvjQX6TPhAvrqaJn3R9VJugIgUr3
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}  # Your Google API credentials stored as a GitHub secret
+        FILE_NAME: ${{ env.FILE_NAME }}
+      run: |
+        if [ -z "$FILE_NAME" ]; then
+          echo "No .json file to upload"
+        else
+          node upload_to_drive.js $FILE_NAME "1U9MQkvjQX6TPhAvrqaJn3R9VJugIgUr3"
+        fi
