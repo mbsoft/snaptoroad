@@ -3,7 +3,8 @@ name: Upload to Google Drive on File Change
 on:
   push:
     paths:
-      - nbai_bookmarks/nbai_tutorials.json  # Specify the file you want to monitor
+      - nbai_bookmarks/nbai_tutorials.json
+  workflow_dispatch:  # Add this to allow manual triggering
 
 jobs:
   upload_to_drive:
