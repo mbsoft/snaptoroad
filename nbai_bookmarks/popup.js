@@ -34,8 +34,8 @@ document.getElementById('json-file-input').addEventListener('change', async (eve
           return;
         }
 
-        // Split the title into category and sub-item
-        const [category, subItem] = title.split(' - ');
+        // Split the title into category and sub-item using '!' as the separator
+        const [category, subItem] = title.split('!');
 
         // Initialize category if not already present
         if (!categories[category]) {
@@ -46,17 +46,14 @@ document.getElementById('json-file-input').addEventListener('change', async (eve
         categories[category].push({ index, subItem: subItem || title });
       });
 
-      // Create hierarchical list
+      // Create hierarchical list or single checkbox
       Object.keys(categories).forEach(category => {
-        const categoryDiv = document.createElement('div');
-        categoryDiv.className = 'category';
-        categoryDiv.textContent = category;
+        const items = categories[category];
 
-        const subItemsDiv = document.createElement('div');
-        subItemsDiv.className = 'sub-items';
+        // If there's only one item, display it directly with the category name
+        if (items.length === 1) {
+          const { index, subItem } = items[0];
 
-        // Add each sub-item with a checkbox
-        categories[category].forEach(({ index, subItem }) => {
           const checkbox = document.createElement('input');
           checkbox.type = 'checkbox';
           checkbox.id = `item-checkbox-${index}`;
@@ -64,24 +61,62 @@ document.getElementById('json-file-input').addEventListener('change', async (eve
 
           const label = document.createElement('label');
           label.htmlFor = `item-checkbox-${index}`;
-          label.textContent = subItem;
+          label.textContent = `${category}: ${subItem}`; // Show both category and sub-item
 
           const br = document.createElement('br');
 
-          subItemsDiv.appendChild(checkbox);
-          subItemsDiv.appendChild(label);
-          subItemsDiv.appendChild(br);
-        });
+          checkboxContainer.appendChild(checkbox);
+          checkboxContainer.appendChild(label);
+          checkboxContainer.appendChild(br);
+        } else {
+          // Create a category header and sub-items if more than one item
+          const categoryDiv = document.createElement('div');
+          categoryDiv.className = 'category';
 
-        // Toggle visibility of sub-items when clicking the category
-        categoryDiv.addEventListener('click', () => {
-          const isDisplayed = subItemsDiv.style.display === 'block';
-          subItemsDiv.style.display = isDisplayed ? 'none' : 'block';
-        });
+          // Add caret icon before the category title
+          const caret = document.createElement('span');
+          caret.className = 'caret';
+          caret.textContent = '▶'; // Caret icon
 
-        // Append category and sub-items to the container
-        checkboxContainer.appendChild(categoryDiv);
-        checkboxContainer.appendChild(subItemsDiv);
+          const categoryTitle = document.createElement('span');
+          categoryTitle.textContent = category;
+
+          categoryDiv.appendChild(caret);
+          categoryDiv.appendChild(categoryTitle);
+
+          const subItemsDiv = document.createElement('div');
+          subItemsDiv.className = 'sub-items';
+
+          // Add each sub-item with a checkbox
+          items.forEach(({ index, subItem }) => {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `item-checkbox-${index}`;
+            checkbox.checked = false;  // Default unchecked
+
+            const label = document.createElement('label');
+            label.htmlFor = `item-checkbox-${index}`;
+            label.textContent = subItem;
+
+            const br = document.createElement('br');
+
+            subItemsDiv.appendChild(checkbox);
+            subItemsDiv.appendChild(label);
+            subItemsDiv.appendChild(br);
+          });
+
+          // Toggle visibility of sub-items and rotate caret when clicking the category
+          categoryDiv.addEventListener('click', () => {
+            const isDisplayed = subItemsDiv.style.display === 'block';
+            subItemsDiv.style.display = isDisplayed ? 'none' : 'block';
+            caret.textContent = isDisplayed ? '▶' : '▼'; // Toggle caret icon
+            categoryDiv.classList.toggle('expanded');  // Toggle expanded state
+          });
+
+          // Append category and sub-items to the container
+          checkboxContainer.appendChild(categoryDiv);
+          checkboxContainer.appendChild(subItemsDiv);
+        }
       });
 
     } catch (error) {
@@ -119,11 +154,15 @@ document.getElementById('upload-button').addEventListener('click', async () => {
         const checkbox = document.getElementById(`item-checkbox-${index}`);
         if (checkbox.checked) {
           const { title, jsonObject } = jsonArray[index];
-          const newKey = `optimization-save-data-${title}`;
-          await storeInLocalStorage(newKey, title, jsonObject);
+
+          // Remove the group identifier and '!' separator from the title
+          const [_, subItem] = title.split('!'); // Discard the group and keep the sub-item
+
+          const newKey = `optimization-save-data-${subItem.trim()}`; // Store using the sub-item only
+          await storeInLocalStorage(newKey, subItem.trim(), jsonObject);
         }
       }
-      alert("Selected NB.ai Bookmarks Saved! Refresh browser window to view");
+      alert("Selected NB.ai Bookmarks Saved!");
 
     } catch (error) {
       alert("Error reading file: " + error.message);

@@ -1,15 +1,37 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>NB.ai Route Optimization Sample Loader</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css" />
     <style>
+      /* Styling for logo */
+      .logo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 40px;
+        height: 40px;
+      }
+
+      /* Adjust content to not overlap with logo */
+      body {
+        padding-left: 60px; /* Adds padding so content does not overlap with logo */
+      }
+
       /* Styling for category headers */
       .category {
         font-weight: bold;
         cursor: pointer;
         margin-top: 10px;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Caret icon for categories */
+      .caret {
+        margin-right: 10px;
+        transition: transform 0.3s ease;
       }
 
       /* Initially hide sub-items */
@@ -18,19 +40,32 @@
         margin-left: 20px;
       }
 
-      /* Add a little spacing between the container and button */
+      /* Rotate caret for expanded state */
+      .expanded .caret {
+        transform: rotate(90deg);
+      }
+
+      /* Adds spacing between the container and button */
       #checkbox-container {
+        margin-bottom: 15px;
+      }
+      /* Add 5px margin below the button */
+      #upload-button {
         margin-bottom: 15px;
       }
     </style>
   </head>
   <body>
-    <h2>Upload NB.ai Route Optimization Bookmarks</h2>
-    <input type="file" id="json-file-input" accept=".json" /><br /><br />
-    
-    <div id="checkbox-container"></div> <!-- Container for dynamically added hierarchical checkboxes -->
+    <!-- Logo at the top-left corner -->
+    <img src="logo.png" class="logo" alt="Logo" />
 
-    <button id="upload-button">Upload and Store Selected Bookmarks</button>
+    <h2>Route Planner Bookmarks</h2>
+    <input type="file" id="json-file-input" accept=".json" /><br /><br />
+
+    <div id="checkbox-container"></div>
+    <!-- Container for dynamically added hierarchical checkboxes -->
+
+    <button id="upload-button">Upload and Store</button>
 
     <script src="popup.js"></script>
   </body>

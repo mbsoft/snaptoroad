@@ -1,6 +1,6 @@
 [
     {
-        "title": "Tutorials - Basic Route Opt.",
+        "title": "Tutorials!Basic Route Opt.",
         "jsonObject": {
             "description": "Basic Route Optimization Example",
             "jobs": [
@@ -211,7 +211,7 @@
         }
     },
     {
-        "title": "Tutorials - Constraints: Max. Waiting Time",
+        "title": "Tutorials!Constraints: Max. Waiting Time",
         "jsonObject": {
             "description": "Max Waiting Time Example",
             "jobs": [
@@ -397,7 +397,7 @@
         }
     },
     {
-        "title": "Tutorials - Custom Cost Matrix",
+        "title": "Tutorials!Custom Cost Matrix",
         "jsonObject": {
             "description": "Custom Cost Matrix Example",
             "jobs": [
@@ -529,7 +529,7 @@
         }
     },
     {
-        "title": "Tutorials - Custom Objective: Equal Task Distribution",
+        "title": "Tutorials!Custom Objective: Equal Task Distribution",
         "jsonObject": {
             "description": "Custom Objective (task distribution) Example",
             "jobs": [
@@ -768,7 +768,7 @@
         }
     },
     {
-        "title": "Tutorials - Re-Optimization: New Tasks",
+        "title": "Tutorials!Re-Optimization: New Tasks",
         "jsonObject": {
             "description": "Re-optimization (new-tasks) Example",
             "jobs": [
@@ -987,7 +987,7 @@
         }
     },
     {
-        "title": "Tutorials - Re-Optimization: Unassigned Tasks",
+        "title": "Tutorials!Re-Optimization: Unassigned Tasks",
         "jsonObject": {
             "description": "Re-optimization (Unassigned) Example",
             "jobs": [
@@ -1191,7 +1191,7 @@
         }
     },
     {
-        "title": "Tutorials - Task Sequencing",
+        "title": "Tutorials!Task Sequencing",
         "jsonObject": {
             "description": "Relations Example",
             "jobs": [
@@ -1595,7 +1595,7 @@
         }
     },
     {
-        "title": "Tutorials - Vehicle Costs",
+        "title": "Tutorials!Vehicle Costs",
         "jsonObject": {
             "description": "Vehicle Cost Example",
             "jobs": [
@@ -1807,7 +1807,7 @@
         }
     },
     {
-        "title": "Tutorials - Soft Constraints",
+        "title": "Tutorials!Soft Constraints",
         "jsonObject": {
             "description": "Soft Constraints Example",
             "jobs": [
@@ -1948,7 +1948,7 @@
         }
     },
     {
-        "title": "Tutorials - Vehicle: Max Travel Cost and Max Tasks",
+        "title": "Tutorials!Vehicle: Max Travel Cost and Max Tasks",
         "jsonObject": {
             "description": "Vehicle MaxTravelCost & MaxTask Example",
             "jobs": [
@@ -2194,7 +2194,7 @@
          }
     },
     {
-        "title": "Tutorials - Order Grouping",
+        "title": "Tutorials!Order Grouping",
         "jsonObject": {
             "description": "Order Grouping Example",
             "locations": {
@@ -2262,7 +2262,7 @@
          }
     },
     {
-        "title": "Tutorials - Depots",
+        "title": "Tutorials!Depots",
         "jsonObject": {
             "description": "Depots Example",
             "locations": {
@@ -2426,7 +2426,7 @@
          }
     },
     {
-        "title": "Tutorials - Zone Based Allocations",
+        "title": "Tutorials!Zone Based Allocations",
         "jsonObject": {
             "description":"Zone Allocation Example",
             "locations": {
@@ -2687,7 +2687,7 @@
             }
     },
     {
-        "title": "Tutorials - Route Grouping",
+        "title": "Tutorials!Route Grouping",
         "jsonObject": {
             "description": "Route Grouping Example",
             "locations": {
@@ -4369,7 +4369,7 @@
         }
     },
     {
-        "title": "Tutorials - Custom Duration & Distance Matrix",
+        "title": "Tutorials!Custom Duration & Distance Matrix",
         "jsonObject":{
             "description": "Custom Distance & Duration Matrix Example",
             "locations": {
@@ -4437,7 +4437,7 @@
         }
     },
     {
-        "title": "Tutorials - Order Incompatibility",
+        "title": "Tutorials!Order Incompatibility",
         "jsonObject":{
             "description": "Order Incompatibility Example",
             "locations": {
@@ -4541,7 +4541,7 @@
          }
     },
     {
-        "title": "Tutorials - Max Ride Time",
+        "title": "Tutorials!Max Ride Time",
         "jsonObject":{
             "description": "Max Ride Time Example",
             "locations": {
@@ -4621,7 +4621,7 @@
          }
     },
     {
-        "title": "Tutorials - Alternative Capacities",
+        "title": "Tutorials!Alternative Capacities",
         "jsonObject":{
             "description": "Alternative Capacities Example",
             "locations": {
@@ -4693,7 +4693,7 @@
           }
     },
     {
-        "title": "Tutorials - Vehicle: Max Distance & Max Travel Time",
+        "title": "Tutorials!Vehicle: Max Distance & Max Travel Time",
         "jsonObject":{
             "description": "Vehicle Max Distance & Max Duration Example",
             "locations":
@@ -4777,7 +4777,7 @@
          }
     },
     {
-        "title": "Tutorials - Multiple Trips to a Depot",
+        "title": "Tutorials!Multiple Trips to a Depot",
         "jsonObject":{
             "description": "Multiple Trips to Depot",
             "locations": {
@@ -4913,7 +4913,7 @@
          }
     },
     {
-        "title": "Tutorials - Maximize Revenue",
+        "title": "Tutorials!Maximize Revenue",
         "jsonObject":{
             "description": "Revenue per Order Example",
             "locations": {
@@ -4971,5 +4971,4 @@
             }
           }
     }
-
 ]
