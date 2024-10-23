@@ -130,6 +130,7 @@ document.getElementById('json-file-input').addEventListener('change', async (eve
 // Event listener to handle uploading selected checkboxes
 document.getElementById('upload-button').addEventListener('click', async () => {
   const fileInput = document.getElementById('json-file-input');
+  const nbroCheckbox = document.getElementById('nbro-checkbox'); // Get the NBRO checkbox
   const file = fileInput.files[0];
 
   if (!file) {
@@ -153,7 +154,22 @@ document.getElementById('upload-button').addEventListener('click', async () => {
       for (let index = 0; index < jsonArray.length; index++) {
         const checkbox = document.getElementById(`item-checkbox-${index}`);
         if (checkbox.checked) {
-          const { title, jsonObject } = jsonArray[index];
+          let { title, jsonObject } = jsonArray[index];
+
+          // Add the `solver_mode: internal` if NBRO is checked
+          if (nbroCheckbox.checked) {
+            if (jsonObject.options) {
+              if (jsonObject.options.objective) {
+                jsonObject.options.objective.solver_mode = 'internal';
+              } else {
+                jsonObject.options.objective = { solver_mode: 'internal' };
+              }
+            } else {
+              jsonObject.options.objective = { solver_mode: 'internal' };
+            }
+            // Append '-NBRO' to the title
+            title = `${title}-NBRO`;
+          }
 
           // Remove the group identifier and '!' separator from the title
           const [_, subItem] = title.split('!'); // Discard the group and keep the sub-item

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "NextBillion.ai Route Optimization Sample Loader",
-  "version": "1.02",
+  "version": "1.03",
   "description": "A Chrome extension to load route optimization samples.",
   "permissions": [ "activeTab", "scripting"],
   "action": {
