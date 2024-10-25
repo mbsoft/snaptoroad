@@ -216,3 +216,23 @@ async function getCurrentTabId() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab.id;
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const nbroCheckbox = document.getElementById('nbro-checkbox');
+
+  // Disable the NBRO checkbox by default
+  nbroCheckbox.disabled = true;
+
+  // Get the user's Google email address
+  chrome.identity.getProfileUserInfo(async (userInfo) => {
+    const email = userInfo.email;
+
+    console.log(`Hello - ${email}`);
+    // Enable NBRO checkbox if the email ends with 'nextbillion.ai'
+    if (email && email.endsWith('nextbillion.ai')) {
+      nbroCheckbox.disabled = false; // Enable NBRO checkbox
+    } else {
+      console.log(email);
+    }
+  });
+});
