@@ -9,7 +9,7 @@ body {
   }
 
   h2 {
-    font-size: 16px;
+    font-size: 12px;
   }
   
   #button-container {
@@ -71,3 +71,16 @@ body {
         height: 100%;
         background-color: rgba(0, 0, 0, 0.5);
       }
+
+    /* Set font for datetime-local inputs */
+    input[type="datetime-local"] {
+      font-family: Arial, sans-serif;
+      font-size: 10pt;
+    }
+
+    /* Set font and width for service time input */
+    input[type="number"]#serviceTime {
+      font-family: Arial, sans-serif;
+      font-size: 10pt;
+      width: 50px; /* Set width to 50px */
+    }

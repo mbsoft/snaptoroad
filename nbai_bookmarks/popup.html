@@ -53,6 +53,15 @@
       #upload-button {
         margin-bottom: 15px;
       }
+      #sample-button {
+        margin-bottom: 15px;
+        margin-top: 10px;
+      }
+      /* Divider styling */
+      .divider {
+        margin: 20px 0;
+        border-bottom: 1px solid #ccc;
+      }
     </style>
   </head>
   <body>
@@ -61,7 +70,7 @@
 
     <h2>Route Planner Bookmarks</h2>
     <input type="file" id="json-file-input" accept=".json" /><br /><br />
-    
+
     <div id="checkbox-container"></div>
     <div id="button-container">
       <button id="upload-button">Upload and Store</button>
@@ -70,9 +79,58 @@
         NBRO
       </label>
     </div>
-    
 
-    
+    <!-- Horizontal divider -->
+    <div class="divider"></div>
+    <h2>Create Sample</h2>
+    <!-- Date selectors for shiftStart and shiftEnd -->
+    <label for="shiftStart">Shift Start:</label>
+    <input type="datetime-local" id="shiftStart" /><br /><br />
+
+    <label for="shiftEnd">Shift End:</label>
+    <input type="datetime-local" id="shiftEnd" /><br /><br />
+
+    <!-- City selector dropdown -->
+    <label for="city-select">Choose a city:</label>
+    <select id="city-select">
+      <option value="la">Los Angeles</option>
+      <option value="berlin">Berlin</option>
+      <option value="columbus">Columbus</option>
+      <option value="hyderabad">Hyderabad</option>      
+      <option value="london">London</option>
+      <option value="newyork">New York</option>
+      <option value="paris">Paris</option>
+      <option value="saopaulo">São Paulo</option>
+      <option value="singapore">Singapore</option>
+      <option value="seattle">Seattle</option>
+    </select>
+    <!-- Number dropdown -->
+    <label for="nbr-select">Number of orders:</label>
+    <select id="nbr-select">
+      <option value="10">10</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+      <option value="200">200</option>
+    </select><br /><br />
+    <!-- Vehicles dropdown -->
+    <label for="veh-select">Number of vehicles:</label>
+    <select id="veh-select">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+    </select><br /><br />
+
+    <!-- Service Time Inputs -->
+    <label for="serviceTime">Service Time (seconds):</label>
+    <input type="number" id="serviceTime" value="600" min="0" /><br /><br />
+
+    <label id="nbro-label2">
+      <input type="checkbox" id="nbro-checkbox2" />
+      NBRO
+    </label><br /><br />
+
+    <button id="sample-button">Copy Sample to Clipboard</button>
     <script src="popup.js"></script>
   </body>
 </html>

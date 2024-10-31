@@ -5,6 +5,7 @@ nbai/
 nbai_fb/ 
 build/
 .vscode
+nbai_bookmarks/ext-build/
 
 .env.*
 package-lock.json
