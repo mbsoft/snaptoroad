@@ -1,0 +1,94 @@
+{
+  "data": [
+    {
+      "originIndex": 0,
+      "destinationIndex": 0,
+      "routesByTime": [
+        {
+          "timeWindow": {
+            "Start": "06:00",
+            "End": "09:00"
+          },
+          "distance": 2321,
+          "duration": 524
+        },
+        {
+          "timeWindow": {
+            "Start": "09:00",
+            "End": "15:00"
+          },
+          "distance": 2321,
+          "duration": 324
+        },
+        {
+          "timeWindow": {
+            "Start": "15:00",
+            "End": "20:00"
+          },
+          "distance": 2321,
+          "duration": 294
+        }
+      ]
+    },
+    {
+      "originIndex": 0,
+      "destinationIndex": 1,
+      "routesByTime": [
+        {
+          "timeWindow": {
+            "Start": "06:00",
+            "End": "09:00"
+          },
+          "distance": 5621,
+          "duration": 1944
+        },
+        {
+          "timeWindow": {
+            "Start": "09:00",
+            "End": "15:00"
+          },
+          "distance": 5621,
+          "duration": 1824
+        },
+        {
+          "timeWindow": {
+            "Start": "15:00",
+            "End": "20:00"
+          },
+          "distance": 6321,
+          "duration": 2194
+        }
+      ]
+    },
+    {
+      "originIndex": 0,
+      "destinationIndex": 2,
+      "routesByTime": [
+        {
+          "timeWindow": {
+            "Start": "06:00",
+            "End": "09:00"
+          },
+          "distance": 13321,
+          "duration": 3124
+        },
+        {
+          "timeWindow": {
+            "Start": "09:00",
+            "End": "15:00"
+          },
+          "distance": 13321,
+          "duration": 3724
+        },
+        {
+          "timeWindow": {
+            "Start": "15:00",
+            "End": "20:00"
+          },
+          "distance": 13321,
+          "duration": 3874
+        }
+      ]
+    }
+  ]
+}
