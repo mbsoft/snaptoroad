@@ -52,7 +52,7 @@ function parseVehicleCapacitiesFromJSON(jsonFilePath) {
 function printEmailTable(results, overallSummary) {
     // Determine column widths
     const headers = [
-        'Route', 'Start Time', 'End Time', 'Total Miles', 'Revenue Miles', 'Empty Miles', 'Load %', 'Passengers', 'Pax/Hr', 'Duration'
+        'Route', 'Start Time', 'End Time', 'Total Miles', 'Revenue Miles', 'Empty Miles', 'Load %', 'Passengers', 'Pax/Hr', 'Total Duration', 'Drive Time'
     ];
     const colWidths = [
         30, // Route description
@@ -64,7 +64,8 @@ function printEmailTable(results, overallSummary) {
         8,  // Load %
         12, // Passengers
         8,  // Passengers per Hour
-        8   // Duration
+        12, // Total Duration
+        12  // Drive Time
     ];
     
     // Header
@@ -84,7 +85,8 @@ function printEmailTable(results, overallSummary) {
             pad(row.loadPercentage + '%', colWidths[6]),
             pad(passengerInfo, colWidths[7]),
             pad(row.passengersPerHour, colWidths[8]),
-            pad(row.routeDuration, colWidths[9])
+            pad(row.totalDuration, colWidths[9]),
+            pad(row.driveTime, colWidths[10])
         ].join(' | ') + '\n';
     }
     
@@ -98,6 +100,8 @@ function printEmailTable(results, overallSummary) {
     table += `Total Empty Miles: ${Math.round(overallSummary.totalEmptyMiles * 100) / 100}\n`;
     table += `Average Load %: ${Math.round(overallSummary.averageLoadPercentage * 100) / 100}%\n`;
     table += `Total Duration: ${formatDuration(overallSummary.totalDuration)}\n`;
+    table += `Total Drive Time: ${formatDuration(overallSummary.totalDriveTime)}\n`;
+    table += `Drive Time %: ${Math.round((overallSummary.totalDriveTime / overallSummary.totalDuration) * 100 * 100) / 100}%\n`;
     table += `Total Ambulatory Passengers: ${overallSummary.totalAmbulatoryPassengers}\n`;
     table += `Total WC Passengers: ${overallSummary.totalWcPassengers}\n`;
     table += `Total Passengers: ${overallSummary.totalPassengers}\n`;
@@ -133,6 +137,12 @@ function calculateRouteKPIs(route, routeIndex, vehicleCapacities) {
     const endStep = steps.find(step => step.type === 'end');
     const startTime = startStep ? formatTime(startStep.arrival) : 'Unknown';
     const endTime = endStep ? formatTime(endStep.arrival) : 'Unknown';
+    
+    // Calculate actual route duration from timestamps
+    const actualDuration = startStep && endStep ? (endStep.arrival - startStep.arrival) : 0;
+    
+    // Get drive time from route data
+    const driveTime = route.duration || 0;
     
     // Process each step
     for (let i = 0; i < steps.length; i++) {
@@ -196,10 +206,13 @@ function calculateRouteKPIs(route, routeIndex, vehicleCapacities) {
     // Calculate average load percentage for the route
     const averageLoadPercentage = totalMiles > 0 ? totalLoadMiles / totalMiles : 0;
     
-    // Calculate passengers per hour
+    // Calculate passengers per hour (using total duration)
     const totalPassengers = ambulatoryPassengers + wcPassengers;
-    const routeHours = route.duration / 3600; // Convert seconds to hours
+    const routeHours = actualDuration / 3600; // Convert seconds to hours
     const passengersPerHour = routeHours > 0 ? totalPassengers / routeHours : 0;
+    
+    // Calculate drive time percentage
+    const driveTimePercentage = actualDuration > 0 ? (driveTime / actualDuration) * 100 : 0;
     
     // Create route description
     const routeDescription = `Route ${routeIndex + 1} - Vehicle ${route.vehicle || 'Unknown'}`;
@@ -212,7 +225,9 @@ function calculateRouteKPIs(route, routeIndex, vehicleCapacities) {
         revenueMiles: Math.round(revenueMiles * 100) / 100,
         emptyMiles: Math.round(emptyMiles * 100) / 100,
         loadPercentage: Math.round(averageLoadPercentage * 100) / 100,
-        routeDuration: formatDuration(route.duration),
+        totalDuration: formatDuration(actualDuration),
+        driveTime: formatDuration(driveTime),
+        driveTimePercentage: Math.round(driveTimePercentage * 100) / 100,
         vehicleCapacity: vehicleCapacity.totalCapacity,
         ambulatoryPassengers,
         wcPassengers,
@@ -232,6 +247,7 @@ function analyzeRoutes(data, vehicleCapacities) {
         totalEmptyMiles: 0,
         totalLoadMiles: 0,
         totalDuration: 0,
+        totalDriveTime: 0,
         totalAmbulatoryPassengers: 0,
         totalWcPassengers: 0,
         totalPassengers: 0,
@@ -245,12 +261,20 @@ function analyzeRoutes(data, vehicleCapacities) {
         const routeKPIs = calculateRouteKPIs(routes[i], i, vehicleCapacities);
         results.push(routeKPIs);
         
+        // Calculate actual duration and drive time for this route
+        const steps = routes[i].steps;
+        const startStep = steps.find(step => step.type === 'start');
+        const endStep = steps.find(step => step.type === 'end');
+        const actualDuration = startStep && endStep ? (endStep.arrival - startStep.arrival) : 0;
+        const driveTime = routes[i].duration || 0;
+        
         // Add to overall summary
         overallSummary.totalMiles += routeKPIs.totalMiles;
         overallSummary.totalRevenueMiles += routeKPIs.revenueMiles;
         overallSummary.totalEmptyMiles += routeKPIs.emptyMiles;
         overallSummary.totalLoadMiles += routeKPIs.totalMiles * routeKPIs.loadPercentage;
-        overallSummary.totalDuration += routes[i].duration;
+        overallSummary.totalDuration += actualDuration;
+        overallSummary.totalDriveTime += driveTime;
         overallSummary.totalAmbulatoryPassengers += routeKPIs.ambulatoryPassengers;
         overallSummary.totalWcPassengers += routeKPIs.wcPassengers;
         overallSummary.totalPassengers += routeKPIs.totalPassengers;
@@ -266,7 +290,8 @@ function analyzeRoutes(data, vehicleCapacities) {
         console.log(`  WC Passengers: ${routeKPIs.wcPassengers}`);
         console.log(`  Total Passengers: ${routeKPIs.totalPassengers}`);
         console.log(`  Passengers per Hour: ${routeKPIs.passengersPerHour}`);
-        console.log(`  Duration: ${routeKPIs.routeDuration}`);
+        console.log(`  Total Duration: ${routeKPIs.totalDuration}`);
+        console.log(`  Drive Time: ${routeKPIs.driveTime} (${routeKPIs.driveTimePercentage}%)`);
         console.log('');
     }
     
@@ -288,6 +313,8 @@ function analyzeRoutes(data, vehicleCapacities) {
     console.log(`Total Empty Miles: ${Math.round(overallSummary.totalEmptyMiles * 100) / 100}`);
     console.log(`Average Load %: ${Math.round(overallSummary.averageLoadPercentage * 100) / 100}%`);
     console.log(`Total Duration: ${formatDuration(overallSummary.totalDuration)}`);
+    console.log(`Total Drive Time: ${formatDuration(overallSummary.totalDriveTime)}`);
+    console.log(`Drive Time %: ${Math.round((overallSummary.totalDriveTime / overallSummary.totalDuration) * 100 * 100) / 100}%`);
     console.log(`Total Ambulatory Passengers: ${overallSummary.totalAmbulatoryPassengers}`);
     console.log(`Total WC Passengers: ${overallSummary.totalWcPassengers}`);
     console.log(`Total Passengers: ${overallSummary.totalPassengers}`);

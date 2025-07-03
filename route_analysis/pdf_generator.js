@@ -18,6 +18,11 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     const stream = fs.createWriteStream('route_analysis_report.pdf');
     doc.pipe(stream);
 
+    // Add header with NextBillion.ai branding
+    addHeader(doc);
+    
+    doc.moveDown(1);
+
     // Header
     doc.fontSize(24)
        .font('Helvetica-Bold')
@@ -48,6 +53,8 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
         ['Total Empty Miles', `${Math.round(overallSummary.totalEmptyMiles * 100) / 100}`],
         ['Average Load %', `${Math.round(overallSummary.averageLoadPercentage * 100) / 100}%`],
         ['Total Duration', formatDuration(overallSummary.totalDuration)],
+        ['Total Drive Time', formatDuration(overallSummary.totalDriveTime)],
+        ['Drive Time %', `${Math.round((overallSummary.totalDriveTime / overallSummary.totalDuration) * 100 * 100) / 100}%`],
         ['Total Ambulatory Passengers', overallSummary.totalAmbulatoryPassengers.toString()],
         ['Total WC Passengers', overallSummary.totalWcPassengers.toString()],
         ['Total Passengers', overallSummary.totalPassengers.toString()],
@@ -68,10 +75,10 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
 
     // Table headers for route details
     const headers = [
-        'Route', 'Start', 'End', 'Miles', 'Revenue', 'Empty', 'Load%', 'Passengers', 'Pax/Hr', 'Duration'
+        'Route', 'Start', 'End', 'Miles', 'Revenue', 'Empty', 'Load%', 'Passengers', 'Pax/Hr', 'Total Duration', 'Drive Time'
     ];
 
-    const columnWidths = [60, 40, 40, 35, 40, 35, 30, 45, 35, 40];
+    const columnWidths = [60, 40, 40, 35, 40, 35, 30, 45, 35, 50, 40];
     const startX = 50;
     let currentY = doc.y;
 
@@ -81,7 +88,7 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
 
     // Draw route data (paginated)
     let pageCount = 1;
-    const rowsPerPage = 25;
+    const rowsPerPage = 20; // Reduced to accommodate new column
     
     for (let i = 0; i < results.length; i++) {
         // Check if we need a new page
@@ -89,12 +96,15 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
             doc.addPage();
             pageCount++;
             
+            // Add header to new page
+            addHeader(doc);
+            
             // Add page header
             doc.fontSize(12)
                .font('Helvetica-Bold')
-               .text(`Route Details (Page ${pageCount})`, 50, 50);
+               .text(`Route Details (Page ${pageCount})`, 50, 80);
             
-            currentY = 80;
+            currentY = 110;
             
             // Redraw header
             drawTableHeader(doc, headers, columnWidths, startX, currentY);
@@ -112,7 +122,8 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
             `${route.loadPercentage}%`,
             `${route.ambulatoryPassengers}A/${route.wcPassengers}W`,
             route.passengersPerHour.toString(),
-            route.routeDuration
+            route.totalDuration,
+            route.driveTime
         ];
 
         drawTableRow(doc, rowData, columnWidths, startX, currentY);
@@ -121,9 +132,13 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
 
     // Vehicle Capacity Summary
     doc.addPage();
+    
+    // Add header to new page
+    addHeader(doc);
+    
     doc.fontSize(16)
        .font('Helvetica-Bold')
-       .text('Vehicle Capacity Summary', 50, 50);
+       .text('Vehicle Capacity Summary', 50, 80);
     
     doc.moveDown(1);
 
@@ -158,6 +173,35 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
         });
         stream.on('error', reject);
     });
+}
+
+// Function to add NextBillion.ai header to each page
+function addHeader(doc) {
+    // Save current position
+    const currentY = doc.y;
+    
+    // Create a simple text-based logo/header
+    doc.fontSize(18)
+       .font('Helvetica-Bold')
+       .fillColor('#1a73e8') // Google blue color
+       .text('NextBillion.ai', 50, 30);
+    
+    // Add "Powered by" text
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor('#666666')
+       .text('Powered by NextBillion.ai', 50, 50);
+    
+    // Reset color
+    doc.fillColor('#000000');
+    
+    // Add a subtle line separator
+    doc.moveTo(50, 65)
+       .lineTo(550, 65)
+       .stroke();
+    
+    // Restore position
+    doc.y = currentY;
 }
 
 function drawTable(doc, data, x, y, width, rowHeight) {
