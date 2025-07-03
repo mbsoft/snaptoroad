@@ -15,7 +15,7 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     });
 
     // Pipe to file
-    const stream = fs.createWriteStream('route_analysis_report.pdf');
+    const stream = fs.createWriteStream('route_analysis2_report.pdf');
     doc.pipe(stream);
 
     // Add header with NextBillion.ai branding
@@ -24,6 +24,8 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     doc.moveDown(1);
 
     // Header
+    doc.y = 80; // Move the cursor further down to avoid overlap
+    
     doc.fontSize(24)
        .font('Helvetica-Bold')
        .text('Route Optimization Analysis Report', { align: 'center' });
@@ -48,19 +50,17 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
         ['Metric', 'Value'],
         ['Total Routes', overallSummary.totalRoutes.toString()],
         ['Unassigned Trips', overallSummary.unassignedTrips.toString()],
-        ['Total Miles', `${Math.round(overallSummary.totalMiles * 100) / 100}`],
-        ['Total Revenue Miles', `${Math.round(overallSummary.totalRevenueMiles * 100) / 100}`],
-        ['Total Empty Miles', `${Math.round(overallSummary.totalEmptyMiles * 100) / 100}`],
+        ['Total Trips', overallSummary.totalTrips.toString()],
+        ['Total Miles', `${Math.round(overallSummary.totalMiles)}`],
+        ['Total Revenue Miles', `${Math.round(overallSummary.totalRevenueMiles)}`],
+        ['Total Empty Miles', `${Math.round(overallSummary.totalEmptyMiles)}`],
         ['Average Load %', `${Math.round(overallSummary.averageLoadPercentage * 100) / 100}%`],
-        ['Total Duration', formatDuration(overallSummary.totalDuration)],
-        ['Total Drive Time', formatDuration(overallSummary.totalDriveTime)],
-        ['Drive Time %', `${Math.round((overallSummary.totalDriveTime / overallSummary.totalDuration) * 100 * 100) / 100}%`],
         ['Total Ambulatory Passengers', overallSummary.totalAmbulatoryPassengers.toString()],
         ['Total WC Passengers', overallSummary.totalWcPassengers.toString()],
         ['Total Passengers', overallSummary.totalPassengers.toString()],
         ['Overall Passengers per Hour', `${Math.round(overallSummary.passengersPerHour * 100) / 100}`],
-        ['Average Miles per Route', `${Math.round((overallSummary.totalMiles / overallSummary.totalRoutes) * 100) / 100}`],
-        ['Average Passengers per Route', `${Math.round((overallSummary.totalPassengers / overallSummary.totalRoutes) * 100) / 100}`]
+        ['Average Miles per Route', `${Math.round((overallSummary.totalMiles / overallSummary.totalRoutes))}`],
+        ['Average Passengers per Route', `${Math.round((overallSummary.totalPassengers / overallSummary.totalRoutes))}`]
     ];
 
     drawTable(doc, summaryData, 50, doc.y, 500, 12);
@@ -75,11 +75,12 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
 
     // Table headers for route details
     const headers = [
-        'Route', 'Start', 'End', 'Miles', 'Revenue', 'Empty', 'Load%', 'Passengers', 'Pax/Hr', 'Total Duration', 'Drive Time'
+        'Vehicle', 'Start', 'End', 'Miles', 'Rev Miles', 'Empty Miles', 'Load%', 'Pax', 'Pax/Hr', 'Total Duration', 'Wait Time'
     ];
 
-    const columnWidths = [60, 40, 40, 35, 40, 35, 30, 45, 35, 50, 40];
-    const startX = 50;
+    const startX = 30;
+    const tableWidth = 540; // A4 width minus small margins
+    const columnWidths = [60, 40, 40, 50, 50, 50, 35, 60, 40, 60, 45]; // Adjusted for wider table
     let currentY = doc.y;
 
     // Draw header
@@ -88,7 +89,7 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
 
     // Draw route data (paginated)
     let pageCount = 1;
-    const rowsPerPage = 20; // Reduced to accommodate new column
+    const rowsPerPage = 32; // Allow more rows per page
     
     for (let i = 0; i < results.length; i++) {
         // Check if we need a new page
@@ -112,18 +113,25 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
         }
 
         const route = results[i];
+        // Extract vehicle ID and get capacity info
+        const vehicleId = route.routeDescription.split('Vehicle ')[1] || 'Unknown';
+        const vehicleCapacity = vehicleCapacities[vehicleId];
+        const ambCapacity = vehicleCapacity && Array.isArray(vehicleCapacity.capacity) ? vehicleCapacity.capacity[0] : 0;
+        const wcCapacity = vehicleCapacity && Array.isArray(vehicleCapacity.capacity) ? vehicleCapacity.capacity[1] : 0;
+        const vehicleDisplay = `${vehicleId} (${ambCapacity}A/${wcCapacity}W)`;
+        
         const rowData = [
-            route.routeDescription,
+            vehicleDisplay,
             route.startTime,
             route.endTime,
-            route.totalMiles.toString(),
-            route.revenueMiles.toString(),
-            route.emptyMiles.toString(),
+            Math.round(route.totalMiles).toString(),
+            Math.round(route.revenueMiles).toString(),
+            Math.round(route.emptyMiles).toString(),
             `${route.loadPercentage}%`,
             `${route.ambulatoryPassengers}A/${route.wcPassengers}W`,
             route.passengersPerHour.toString(),
             route.totalDuration,
-            route.driveTime
+            route.waitTime
         ];
 
         drawTableRow(doc, rowData, columnWidths, startX, currentY);
@@ -149,20 +157,22 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     
     for (const vehicleId of sortedVehicles) {
         const capacity = vehicleCapacities[vehicleId];
+        const ambulatorySlots = Array.isArray(capacity.capacity) ? capacity.capacity[0] : 0;
+        const wcSlots = Array.isArray(capacity.capacity) ? capacity.capacity[1] : 0;
         capacityData.push([
             vehicleId,
-            capacity.ambulatorySlots.toString(),
-            capacity.wcSlots.toString(),
+            ambulatorySlots.toString(),
+            wcSlots.toString(),
             capacity.totalCapacity.toString()
         ]);
     }
 
     drawTable(doc, capacityData, 50, doc.y, 500, 12);
 
-    // Footer
-    doc.fontSize(8)
+    // Footer: smaller font and less vertical space
+    doc.fontSize(6)
        .font('Helvetica')
-       .text(`Page ${doc.bufferedPageRange().count}`, 50, doc.page.height - 50, { align: 'center' });
+       .text(`Page ${doc.bufferedPageRange().count}`, 30, doc.page.height - 20, { align: 'center' });
 
     doc.end();
 
@@ -182,7 +192,7 @@ function addHeader(doc) {
     
     try {
         // Add the MapFusion logo image
-        doc.image('mapfusion.png', 50, 20, { width: 90 });
+        doc.image('mapfusion.png', 50, 20, { width: 67 });
         
         // Add "Powered by NextBillion.ai" text next to the logo
         doc.fontSize(12)
@@ -193,9 +203,9 @@ function addHeader(doc) {
         // Reset color
         doc.fillColor('#000000');
         
-        // Add a subtle line separator
-        doc.moveTo(50, 70)
-           .lineTo(550, 70)
+        // Move the line separator higher (just below the logo/text)
+        doc.moveTo(50, 60)
+           .lineTo(550, 60)
            .stroke();
         
     } catch (error) {
@@ -217,9 +227,9 @@ function addHeader(doc) {
         // Reset color
         doc.fillColor('#000000');
         
-        // Add a subtle line separator
-        doc.moveTo(50, 65)
-           .lineTo(550, 65)
+        // Move the line separator higher
+        doc.moveTo(50, 60)
+           .lineTo(550, 60)
            .stroke();
     }
     
@@ -297,10 +307,10 @@ function drawTableRow(doc, rowData, columnWidths, startX, y) {
     }
 }
 
-function formatDuration(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}:${minutes.toString().padStart(2, '0')}`;
+function formatDurationHrsMin(seconds) {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    return `${hrs} HRS ${mins} MN`;
 }
 
 function formatTime(timestamp) {
