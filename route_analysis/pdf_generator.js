@@ -38,7 +38,7 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     // Overall Summary Section
     doc.fontSize(16)
        .font('Helvetica-Bold')
-       .text('Overall Summary');
+       .text('Overall Summary', { align: 'left' });
     
     doc.moveDown(0.5);
     doc.fontSize(10)
@@ -69,7 +69,7 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     // Route Details Section
     doc.fontSize(16)
        .font('Helvetica-Bold')
-       .text('Route Details');
+       .text('Route Details', { align: 'left' });
     
     doc.moveDown(1);
 
@@ -182,7 +182,7 @@ function addHeader(doc) {
     
     try {
         // Add the MapFusion logo image
-        doc.image('mapfusion.png', 50, 20, { width: 120 });
+        doc.image('mapfusion.png', 50, 20, { width: 90 });
         
         // Add "Powered by NextBillion.ai" text next to the logo
         doc.fontSize(12)
