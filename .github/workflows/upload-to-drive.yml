@@ -1,0 +1,43 @@
+name: Upload JSON Files to Google Drive on Change
+
+on:
+  push:
+    paths:
+      - '**/*.json'  # Monitor all .json files in the repository
+  workflow_dispatch:
+
+jobs:
+  upload_to_drive:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2  # Fetch the last 2 commits, so we can compare against the previous commit
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - name: Install dependencies
+      run: npm install googleapis
+
+    - name: Find the modified .json file
+      id: get_changed_file
+      run: |
+        # Find the changed .json file(s) and store the first one in an environment variable
+        FILE=$(git diff --name-only --diff-filter=AM HEAD^ HEAD | grep '\.json$' | head -n 1)
+        echo "FILE_NAME=$FILE" >> $GITHUB_ENV
+
+    - name: Upload file to Google Drive
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        FILE_NAME: ${{ env.FILE_NAME }}
+      run: |
+        if [ -z "$FILE_NAME" ]; then
+          echo "No .json file to upload"
+        else
+          node upload_to_drive.js $FILE_NAME "1U9MQkvjQX6TPhAvrqaJn3R9VJugIgUr3"
+        fi
