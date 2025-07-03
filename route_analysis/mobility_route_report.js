@@ -30,26 +30,21 @@ function pad(str, len) {
     return str + ' '.repeat(Math.max(0, len - str.length));
 }
 
-// Parse CSV file and create vehicle capacity lookup
-function parseVehicleCapacities(csvFilePath) {
-    const csvContent = fs.readFileSync(csvFilePath, 'utf8');
-    const lines = csvContent.split('\n');
+// Parse vehicle capacities from JSON file
+function parseVehicleCapacitiesFromJSON(jsonFilePath) {
+    const vehicles = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
     const vehicleCapacities = {};
-    
-    // Skip header line
-    for (let i = 1; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line) {
-            const [vehicleId, , , , , ambulatorySlots, wcSlots] = line.split(',');
-            const totalCapacity = parseInt(ambulatorySlots) + parseInt(wcSlots);
-            vehicleCapacities[vehicleId] = {
-                ambulatorySlots: parseInt(ambulatorySlots),
-                wcSlots: parseInt(wcSlots),
-                totalCapacity: totalCapacity
-            };
-        }
+    for (const v of vehicles) {
+        const vehicleId = String(v.vehicle_id);
+        const ambulatorySlots = parseInt(v.ambulatory_slots ?? v.ambulatorySlots);
+        const wcSlots = parseInt(v.wc_slots ?? v.wcSlots);
+        const totalCapacity = ambulatorySlots + wcSlots;
+        vehicleCapacities[vehicleId] = {
+            ambulatorySlots,
+            wcSlots,
+            totalCapacity
+        };
     }
-    
     return vehicleCapacities;
 }
 
@@ -309,29 +304,29 @@ function analyzeRoutes(data, vehicleCapacities) {
 function parseArgs() {
     const args = process.argv.slice(2);
     let jsonFile = './test_mobility_solution.json';
-    let csvFile = './test_vehicles.csv';
+    let vehicleFile = './test_vehicles.json';
     
     for (let i = 0; i < args.length; i++) {
         if (args[i] === '--help' || args[i] === '-h') {
-            console.log('Usage: node mobility_route_report.js [route_solution.json] [vehicles.csv]');
-            console.log('Defaults: ./test_mobility_solution.json ./test_vehicles.csv');
+            console.log('Usage: node mobility_route_report.js [route_solution.json] [vehicles.json]');
+            console.log('Defaults: ./test_mobility_solution.json ./test_vehicles.json');
             process.exit(0);
         }
         if (i === 0 && args[i].endsWith('.json')) jsonFile = args[i];
-        if (i === 1 && args[i].endsWith('.csv')) csvFile = args[i];
+        if (i === 1 && args[i].endsWith('.json')) vehicleFile = args[i];
     }
-    return { jsonFile, csvFile };
+    return { jsonFile, vehicleFile };
 }
 
 // Main execution
 async function main() {
     try {
         // Parse command line args
-        const { jsonFile, csvFile } = parseArgs();
+        const { jsonFile, vehicleFile } = parseArgs();
         // Read the JSON file
         const data = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
-        // Parse vehicle capacities from CSV
-        const vehicleCapacities = parseVehicleCapacities(csvFile);
+        // Parse vehicle capacities from JSON
+        const vehicleCapacities = parseVehicleCapacitiesFromJSON(vehicleFile);
         console.log(`Loaded capacity data for ${Object.keys(vehicleCapacities).length} vehicles\n`);
         // Perform analysis
         const analysis = analyzeRoutes(data, vehicleCapacities);
@@ -362,4 +357,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     main();
 }
 
-export { calculateRouteKPIs, analyzeRoutes, formatDuration, metersToMiles, parseVehicleCapacities, formatTime, parseArgs }; 
+export { calculateRouteKPIs, analyzeRoutes, formatDuration, metersToMiles, parseVehicleCapacitiesFromJSON as parseVehicleCapacities, formatTime, parseArgs }; 

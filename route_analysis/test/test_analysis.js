@@ -54,14 +54,16 @@ function testFormatTime() {
 }
 
 function testParseVehicleCapacities() {
-    const csvPath = createTempFile(sampleCSVContent, 'test_vehicles.csv');
-    
+    // Use sampleVehicleData directly, as parseVehicleCapacities now expects JSON
+    const tempJsonPath = createTempFile(JSON.stringify(Object.values(sampleVehicleData).map((v, i) => ({
+        vehicle_id: Object.keys(sampleVehicleData)[i],
+        ambulatory_slots: v.ambulatorySlots,
+        wc_slots: v.wcSlots
+    })), null, 2), 'test_vehicles.json');
     try {
-        const capacities = parseVehicleCapacities(csvPath);
-        
-        assertObjectEqual(capacities, sampleVehicleData, 'Should parse CSV correctly');
+        const capacities = parseVehicleCapacities(tempJsonPath);
+        assertObjectEqual(capacities, sampleVehicleData, 'Should parse JSON correctly');
         assertEqual(Object.keys(capacities).length, 2, 'Should parse 2 vehicles');
-        
         // Test individual vehicle data
         assertEqual(capacities['2638'].ambulatorySlots, 3, 'Should parse ambulatory slots');
         assertEqual(capacities['2638'].wcSlots, 1, 'Should parse WC slots');
@@ -75,22 +77,19 @@ function testParseArgs() {
     // Test default arguments
     const originalArgv = process.argv;
     process.argv = ['node', 'mobility_route_report.js'];
-    
     try {
         const args = parseArgs();
         assertEqual(args.jsonFile, './test_mobility_solution.json', 'Should use default JSON file');
-        assertEqual(args.csvFile, './test_vehicles.csv', 'Should use default CSV file');
+        assertEqual(args.vehicleFile, './test_vehicles.json', 'Should use default vehicle JSON file');
     } finally {
         process.argv = originalArgv;
     }
-    
     // Test custom arguments
-    process.argv = ['node', 'mobility_route_report.js', 'custom.json', 'custom.csv'];
-    
+    process.argv = ['node', 'mobility_route_report.js', 'custom.json', 'custom_vehicles.json'];
     try {
         const args = parseArgs();
         assertEqual(args.jsonFile, 'custom.json', 'Should use custom JSON file');
-        assertEqual(args.csvFile, 'custom.csv', 'Should use custom CSV file');
+        assertEqual(args.vehicleFile, 'custom_vehicles.json', 'Should use custom vehicle JSON file');
     } finally {
         process.argv = originalArgv;
     }

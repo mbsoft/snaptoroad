@@ -9,7 +9,7 @@ A comprehensive Node.js application for analyzing route optimization solutions a
 - **Passenger Analytics**: Count of ambulatory and wheelchair passengers transported per route
 - **Efficiency Metrics**: Passengers per hour calculations for transportation efficiency
 - **Timing Analysis**: Route start and end times in 24-hour format
-- **Vehicle Utilization**: Load percentage based on vehicle capacity from CSV data
+- **Vehicle Utilization**: Load percentage based on vehicle capacity from JSON data
 
 ### Output Formats
 - **Console Output**: Detailed analysis with individual route breakdowns
@@ -19,7 +19,7 @@ A comprehensive Node.js application for analyzing route optimization solutions a
 
 ### Data Sources
 - **Route Solution JSON**: Contains optimized route data with steps, distances, and passenger loads
-- **Vehicle Capacity CSV**: Defines vehicle types and passenger capacity limits
+- **Vehicle Capacity JSON**: Defines vehicle types and passenger capacity limits
 
 ## Installation
 
@@ -40,12 +40,12 @@ The script requires you to specify the input files as parameters. There are no d
 
 ### Using the Test Files
 ```bash
-node mobility_route_report.js test_mobility_solution.json test_vehicles.csv
+node mobility_route_report.js test_mobility_solution.json test_vehicles.json
 ```
 
 ### Custom Input Files
 ```bash
-node mobility_route_report.js [route_solution.json] [vehicles.csv]
+node mobility_route_report.js [route_solution.json] [vehicles.json]
 ```
 
 ### Help
@@ -56,13 +56,13 @@ node mobility_route_report.js --help
 ### Examples
 ```bash
 # Run with test files
-node mobility_route_report.js test_mobility_solution.json test_vehicles.csv
+node mobility_route_report.js test_mobility_solution.json test_vehicles.json
 
 # Run with custom files in parent directory
-node mobility_route_report.js ../my_routes.json ../my_vehicles.csv
+node mobility_route_report.js ../my_routes.json ../my_vehicles.json
 
 # Run with absolute paths
-node mobility_route_report.js /path/to/routes.json /path/to/vehicles.csv
+node mobility_route_report.js /path/to/routes.json /path/to/vehicles.json
 ```
 
 ## Input File Formats
@@ -90,11 +90,23 @@ Expected structure:
 }
 ```
 
-### Vehicle Capacity CSV
+### Vehicle Capacity JSON
 Expected format:
-```csv
-vehicle_id,start_location_latitude,start_location_longitude,end_location_latitude,end_location_longitude,ambulatory_slots,wc_slots,shift_start,shift_end
-2638,26.68488,-80.17861,26.68488,-80.17861,3,1,4/7/2024 5:30:00 AM,4/7/2024 8:30:00 PM
+```json
+[
+  {
+    "vehicle_id": 2638,
+    "start_location_latitude": 26.68488,
+    "start_location_longitude": -80.17861,
+    "end_location_latitude": 26.68488,
+    "end_location_longitude": -80.17861,
+    "ambulatory_slots": 3,
+    "wc_slots": 1,
+    "shift_start": "4/7/2024 5:30:00 AM",
+    "shift_end": "4/7/2024 8:30:00 PM"
+  },
+  ...
+]
 ```
 
 ## Output Files
@@ -152,7 +164,7 @@ Tests are located in the `test/` directory and cover:
 
 The application handles common error scenarios:
 - Missing or malformed input files
-- Invalid JSON/CSV formats
+- Invalid JSON formats
 - Missing vehicle capacity data
 - File permission issues
 
