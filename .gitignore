@@ -1,0 +1,14 @@
+# Node modules
+node_modules/
+
+# Output files
+route_analysis_results.json
+route_analysis_report.pdf
+
+# Test and temp files
+test/temp/
+*.log
+.DS_Store
+
+# OS junk
+Thumbs.db 

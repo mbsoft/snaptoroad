@@ -1,0 +1,16 @@
+{
+  "name": "route-analysis",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Route optimization analysis with PDF reporting",
+  "main": "mobility_route_report.js",
+  "scripts": {
+    "start": "node mobility_route_report.js",
+    "test": "node test/test_analysis.js && node test/test_pdf.js",
+    "test:analysis": "node test/test_analysis.js",
+    "test:pdf": "node test/test_pdf.js"
+  },
+  "dependencies": {
+    "pdfkit": "^0.14.0"
+  }
+} 
