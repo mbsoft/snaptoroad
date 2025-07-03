@@ -102,9 +102,9 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
             // Add page header
             doc.fontSize(12)
                .font('Helvetica-Bold')
-               .text(`Route Details (Page ${pageCount})`, 50, 80);
+               .text(`Route Details (Page ${pageCount})`, 50, 90);
             
-            currentY = 110;
+            currentY = 120;
             
             // Redraw header
             drawTableHeader(doc, headers, columnWidths, startX, currentY);
@@ -138,7 +138,7 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     
     doc.fontSize(16)
        .font('Helvetica-Bold')
-       .text('Vehicle Capacity Summary', 50, 80);
+       .text('Vehicle Capacity Summary', 50, 90);
     
     doc.moveDown(1);
 
@@ -180,25 +180,48 @@ function addHeader(doc) {
     // Save current position
     const currentY = doc.y;
     
-    // Create a simple text-based logo/header
-    doc.fontSize(18)
-       .font('Helvetica-Bold')
-       .fillColor('#1a73e8') // Google blue color
-       .text('NextBillion.ai', 50, 30);
-    
-    // Add "Powered by" text
-    doc.fontSize(10)
-       .font('Helvetica')
-       .fillColor('#666666')
-       .text('Powered by NextBillion.ai', 50, 50);
-    
-    // Reset color
-    doc.fillColor('#000000');
-    
-    // Add a subtle line separator
-    doc.moveTo(50, 65)
-       .lineTo(550, 65)
-       .stroke();
+    try {
+        // Add the MapFusion logo image
+        doc.image('mapfusion.png', 50, 20, { width: 120 });
+        
+        // Add "Powered by NextBillion.ai" text next to the logo
+        doc.fontSize(12)
+           .font('Helvetica-Bold')
+           .fillColor('#1a73e8') // Google blue color
+           .text('Powered by NextBillion.ai', 180, 35);
+        
+        // Reset color
+        doc.fillColor('#000000');
+        
+        // Add a subtle line separator
+        doc.moveTo(50, 70)
+           .lineTo(550, 70)
+           .stroke();
+        
+    } catch (error) {
+        // Fallback to text-based logo if image fails to load
+        console.warn('Could not load mapfusion.png, using text-based logo');
+        
+        // Create a simple text-based logo/header
+        doc.fontSize(18)
+           .font('Helvetica-Bold')
+           .fillColor('#1a73e8') // Google blue color
+           .text('NextBillion.ai', 50, 30);
+        
+        // Add "Powered by" text
+        doc.fontSize(10)
+           .font('Helvetica')
+           .fillColor('#666666')
+           .text('Powered by NextBillion.ai', 50, 50);
+        
+        // Reset color
+        doc.fillColor('#000000');
+        
+        // Add a subtle line separator
+        doc.moveTo(50, 65)
+           .lineTo(550, 65)
+           .stroke();
+    }
     
     // Restore position
     doc.y = currentY;
