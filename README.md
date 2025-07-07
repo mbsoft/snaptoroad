@@ -1,169 +1,65 @@
-# Mobility Route Analysis & Reporting System
+# API documentation
+[https://doc.maps.nextbillion.io/api_reference/]
 
-A comprehensive Node.js application for analyzing route optimization solutions and generating detailed reports with key performance indicators (KPIs) for transportation fleets.
+# Directions
+![Alt text](./screen_directions.png "Screenshot")
+## Description
+Utility used to test ETA, distance, and reverse geocoding
+- random origin/destination pair within a defined area-of-interest
+- show the route distance and duration
+- use reverse geocoding service to describe the route maneuver locations
 
-## Features
+## Quick Start
+- `npm install`
+- modify the `.env` file for
+  - entries API_HOST (http://localhost:9999 or https://api.nextbillion.io) 
+  - API_KEY (your assigned key)
+  - AREA_OF_INTEREST (based on geojson files in `data` folder - atlanta, bangalore, la, london, newyork, ohio, ontario, sf, south yorkshire, texas currently)
+- alter the number of routes to be compared in the constant defined in `directions/compare.js`
+- `node directions/directions.js --aoi la`
 
-### Core Analysis
-- **Route Performance Metrics**: Total miles, revenue miles, empty miles, and load percentages
-- **Passenger Analytics**: Count of ambulatory and wheelchair passengers transported per route
-- **Efficiency Metrics**: Passengers per hour calculations for transportation efficiency
-- **Timing Analysis**: Route start and end times in 24-hour format
-- **Vehicle Utilization**: Load percentage based on vehicle capacity from CSV data
+# Routing Compare
+![Alt text](./screen_compare.png "Screenshot")
+## Description
+Utility used to perform route result comparisons (distance/duration) across different service providers.
+- random set of lat/lon pairs within a defined area-of-interest
+- define number of routes to compare
+- output is comparison of results from NBAI, TomTom, Google, and Mapbox
 
-### Output Formats
-- **Console Output**: Detailed analysis with individual route breakdowns
-- **Email-Ready Table**: Formatted table suitable for copy-paste into email communications
-- **PDF Report**: Professional multi-page report with summary tables and detailed route data
-- **JSON Export**: Complete analysis data for further processing
+## Quick Start
+- `npm install`
+- modify the `.env` file for
+  - entries API_HOST (http://localhost:9999 or https://api.nextbillion.io) 
+  - API_KEY (your assigned key)
+  - AREA_OF_INTEREST (based on geojson files in `data` folder - atlanta, bangalore, la, london, newyork, ohio, ontario, sf, south yorkshire, texas currently)
+  - keys required for other service providers - TomTom, Google, and Mapbox
+- alter the number of routes to be compared in the constant defined in `directions/compare.js`
+- `node directions/compare.js --aoi la`
+  
+# Distance Matrix
+![Alt text](./screenshot.png "Screenshot")
+## Description
+Javascript/node.js example of Nextbillion.ai travel/distance matrix calculation API using Flatbuffer, Protobuf, and JSON endpoints. 
+- random set of lat/lon pairs within a defined polygon
+- default size of grid is 8 x 8
+- `.env` file is read to determine endpoint, key, area of interest
+- command line parameters allow user to set area-of-interest, number of origins, and number of destinations
 
-### Data Sources
-- **Route Solution JSON**: Contains optimized route data with steps, distances, and passenger loads
-- **Vehicle Capacity CSV**: Defines vehicle types and passenger capacity limits
+## Quick Start
+- install Flatbuffers `brew install flatbuffer`
+- install Protobuf `brew install protobuf`
+- install TypeScript transpiler `brew install tsc`
+- compile the nextbillion.ai schema to generate TypeScript files `flatc -o build/gen --ts nbai_fbschema.fbs`
+- compile the protobuf definition to JavaScript `protoc --proto_path=. --js_out=library=nbai_pb/matrix,binary:build/gen  nbai_protos.proto`
+- `npm install`
+- transpile TS to JS `tsc build/gen/nbai_fb/*.ts`
+- modify the `.env` file for 
+  - entries API_HOST (http://localhost:9999 or https://api.nextbillion.io) 
+  - API_KEY (your assigned key)
+  - AREA_OF_INTEREST (based on geojson files in `data` folder - la, london, ontario, south yorkshire currently)
+- Usage: `node distancematrix/distmatrix.json --format json --origins {int} --destinations {int} --aoi atlanta|bangalore|dallas|la|london|newyork|ohio|ontario|southyorkshire`
+- output to console is the time distance grid and the size of the response
 
-## Installation
 
-1. Navigate to the route_analysis directory:
-```bash
-cd route_analysis
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-## Usage
-
-### Required Parameters
-The script requires you to specify the input files as parameters. There are no default files.
-
-### Using the Test Files
-```bash
-node mobility_route_report.js test_mobility_solution.json test_vehicles.csv
-```
-
-### Custom Input Files
-```bash
-node mobility_route_report.js [route_solution.json] [vehicles.csv]
-```
-
-### Help
-```bash
-node mobility_route_report.js --help
-```
-
-### Examples
-```bash
-# Run with test files
-node mobility_route_report.js test_mobility_solution.json test_vehicles.csv
-
-# Run with custom files in parent directory
-node mobility_route_report.js ../my_routes.json ../my_vehicles.csv
-
-# Run with absolute paths
-node mobility_route_report.js /path/to/routes.json /path/to/vehicles.csv
-```
-
-## Input File Formats
-
-### Route Solution JSON
-Expected structure:
-```json
-{
-  "routes": [
-    {
-      "vehicle": "vehicle_id",
-      "duration": 12345,
-      "steps": [
-        {
-          "type": "start|pickup|delivery|end",
-          "arrival": 1712489481,
-          "distance": 0,
-          "load": [ambulatory_count, wheelchair_count],
-          "id": "passenger_id"
-        }
-      ]
-    }
-  ],
-  "unassigned": [...]
-}
-```
-
-### Vehicle Capacity CSV
-Expected format:
-```csv
-vehicle_id,start_location_latitude,start_location_longitude,end_location_latitude,end_location_longitude,ambulatory_slots,wc_slots,shift_start,shift_end
-2638,26.68488,-80.17861,26.68488,-80.17861,3,1,4/7/2024 5:30:00 AM,4/7/2024 8:30:00 PM
-```
-
-## Output Files
-
-### Console Output
-- Individual route analysis with all KPIs
-- Overall summary statistics
-- Email-ready formatted table
-
-### Generated Files
-- `route_analysis_results.json` - Complete analysis data
-- `route_analysis_report.pdf` - Professional PDF report
-
-## Key Performance Indicators
-
-### Route-Level Metrics
-- **Total Miles**: Complete route distance in miles
-- **Revenue Miles**: Distance traveled with passengers onboard
-- **Empty Miles**: Distance traveled without passengers
-- **Load Percentage**: Average vehicle utilization across the route
-- **Passengers per Hour**: Transportation efficiency metric
-- **Start/End Times**: Route timing in 24-hour format
-
-### Fleet-Level Metrics
-- **Total Routes**: Number of assigned routes
-- **Unassigned Trips**: Count of trips that couldn't be assigned
-- **Overall Efficiency**: Fleet-wide passengers per hour
-- **Average Utilization**: Mean load percentage across all routes
-
-## PDF Report Contents
-
-1. **Executive Summary**: Key fleet performance metrics
-2. **Route Details**: Comprehensive table of all routes with KPIs
-3. **Vehicle Capacity Summary**: Fleet composition and capacity data
-
-## Dependencies
-
-- **pdfkit**: PDF generation library
-- **Node.js**: Runtime environment (v14+ recommended)
-
-## Testing
-
-Run the test suite:
-```bash
-npm test
-```
-
-Tests are located in the `test/` directory and cover:
-- Data parsing functionality
-- KPI calculations
-- PDF generation
-- Error handling
-
-## Error Handling
-
-The application handles common error scenarios:
-- Missing or malformed input files
-- Invalid JSON/CSV formats
-- Missing vehicle capacity data
-- File permission issues
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
+## Questions
+jim.welch@nextbillion.ai
