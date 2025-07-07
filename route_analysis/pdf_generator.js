@@ -15,7 +15,7 @@ export function generatePDFReport(results, overallSummary, vehicleCapacities) {
     });
 
     // Pipe to file
-    const stream = fs.createWriteStream('route_analysis2_report.pdf');
+    const stream = fs.createWriteStream('route_analysis_report.pdf');
     doc.pipe(stream);
 
     // Add header with NextBillion.ai branding
