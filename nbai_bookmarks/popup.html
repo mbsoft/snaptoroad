@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NB.ai Route Optimization Sample Loader</title>
     <link rel="stylesheet" href="style.css" />
     <style>
@@ -69,13 +70,14 @@
     <img src="logo.png" class="logo" alt="Logo" />
 
     <h2>Route Planner Bookmarks</h2>
-    <input type="file" id="json-file-input" accept=".json" /><br /><br />
+    <label for="json-file-input">Upload JSON File:</label>
+    <input type="file" id="json-file-input" accept=".json" title="Choose a JSON file to upload" /><br /><br />
 
     <div id="checkbox-container"></div>
     <div id="button-container">
       <button id="upload-button">Upload and Store</button>
       <label id="nbro-label">
-        <input type="checkbox" id="nbro-checkbox" />
+        <input type="checkbox" id="nbro-checkbox" checked />
         NBRO
       </label>
     </div>
@@ -83,55 +85,103 @@
     <!-- Horizontal divider -->
     <div class="divider"></div>
     <h2>Create Sample</h2>
-    <!-- Date selectors for shiftStart and shiftEnd -->
+    <!-- Date selectors for shiftStart and shiftEnd on the same row -->
     <label for="shiftStart">Shift Start:</label>
-    <input type="datetime-local" id="shiftStart" /><br /><br />
-
+    <input type="datetime-local" id="shiftStart" style="margin-right: 15px;" />
+    
     <label for="shiftEnd">Shift End:</label>
     <input type="datetime-local" id="shiftEnd" /><br /><br />
 
-    <!-- City selector dropdown -->
-    <label for="city-select">Choose a city:</label>
-    <select id="city-select">
+    <!-- Combined row for city, use case, and jobs/shipments -->
+    <label for="city-select">City:</label>
+    <select id="city-select" style="width: 100px; margin-right: 15px;">
       <option value="la">Los Angeles</option>
+      <option value="bangalore">Bangalore</option>
       <option value="berlin">Berlin</option>
+      <option value="chennai">Chennai</option>
+      <option value="chicago" selected>Chicago</option>
       <option value="columbus">Columbus</option>
+      <option value="dallas">Dallas</option>
+      <option value="delhi">Delhi</option>
+      <option value="dubai">Dubai</option>
+      <option value="dublin">Dublin, OH</option>
+      <option value="hamburg">Hamburg</option>
+      <option value="helsinki">Helsinki</option>
       <option value="houston">Houston</option>
       <option value="hyderabad">Hyderabad</option>      
       <option value="london">London</option>
+      <option value="mexico">Mexico City</option>
       <option value="newyork">New York</option>
+      <option value="oslo">Oslo</option>
       <option value="paris">Paris</option>
+      <option value="czech">Prague</option>
       <option value="saopaulo">São Paulo</option>
+      <option value="santiago">Santiago</option>
       <option value="singapore">Singapore</option>
       <option value="seattle">Seattle</option>
+      <option value="sydney">Sydney</option>
+      <option value="telaviv">Tel Aviv</option>
+      <option value="toronto">Toronto</option>
+      <option value="usa">USA - Long Distance</option>
     </select>
-    <!-- Number dropdown -->
-    <label for="nbr-select">Number of orders:</label>
-    <select id="nbr-select">
+    
+    <label for="usecase-select">Use case:</label>
+    <select id="usecase-select" style="margin-right: 15px;">
+      <option value="shipments">Shipments</option>
+      <option value="jobs" selected>Jobs</option>
+      <option value="mixed">Mixed</option>
+    </select>
+    
+    <label for="nbr-select">Jobs/Shipments:</label>
+    <select id="nbr-select" style="width: 60px;">
       <option value="10">10</option>
       <option value="50">50</option>
-      <option value="100">100</option>
+      <option value="100" selected>100</option>
       <option value="200">200</option>
       <option value="1000">1000</option>
     </select><br /><br />
-    <!-- Vehicles dropdown -->
-    <label for="veh-select">Number of vehicles:</label>
-    <select id="veh-select">
+
+    <!-- Combined row for vehicles, service time, and max tasks -->
+    <label for="veh-select">Nbr veh/techs:</label>
+    <select id="veh-select" style="width: 50px; margin-right: 15px;" >
+      <option value="1">1</option>   
       <option value="5">5</option>
-      <option value="10">10</option>
+      <option value="10" selected>10</option>
       <option value="25">25</option>
       <option value="50">50</option>
       <option value="100">100</option>
-    </select><br /><br />
+      <option value="200">200</option>
+      <option value="500">500</option>
+      <option value="1000">1000</option>
+    </select>
 
-    <!-- Service Time Inputs -->
-    <label for="serviceTime">Service Time (seconds):</label>
-    <input type="number" id="serviceTime" value="600" min="0" /><br /><br />
+    <label for="serviceTime">Service Time (s):</label>
+    <input type="number" id="serviceTime" value="600" min="0" style="width: 60px; margin-right: 15px;" />
 
+    <label for="maxTasks">Max Tasks:</label>
+    <input type="number" id="maxTasks" value="12" min="0" style="width: 50px;" /><br /><br />
+    <!-- <label for="maxDistance">Max Distance(km):</label> -->
+    <!-- <input type="number" id="maxDistance" value="25" min="0" style="width: 50px;" /><br /><br /> -->
+    <label id="roundtrip-label">
+      <input type="checkbox" id="roundtrip-checkbox" checked />
+      Roundtrip
+    </label>
     <label id="nbro-label2">
       <input type="checkbox" id="nbro-checkbox2" />
-      NBRO
-    </label><br /><br />
+      Traffic Timestamp
+    </label>
+    <label id="skills-label">
+      <input type="checkbox" id="skills-checkbox" />
+      Enable Skills
+    </label>
+    <label id="timewindows-label">
+      <input type="checkbox" id="timewindows-checkbox" />
+      Time Windows
+    </label>
+    <div>
+      <input type="checkbox" id="cache-checkbox" checked>
+      <label for="cache-checkbox">Cache enable</label>
+    </div>
 
     <button id="sample-button">Copy Sample to Clipboard</button>
     <script src="popup.js"></script>

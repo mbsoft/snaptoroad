@@ -37,6 +37,8 @@ exports.handler = async (event) => {
                     "longitude": pointsOrigins[j].geometry.coordinates[0].toFixed(precision),
                     "name": casual.full_name,
                     "business": casual.company_name,
+                    "address": casual.address,
+                    "instructions": casual.sentence,
                     "phone": casual.phone,
                     "attributes": [casual.integer(1,5)],
                     "priority": casual.coin_flip
@@ -55,7 +57,9 @@ exports.handler = async (event) => {
                         "business": casual.company_name,
                         "phone": casual.phone,
                         "attributes": [casual.integer(1,5)],
-                        "priority": casual.coin_flip
+                        "priority": casual.coin_flip,
+                        "address": casual.address,
+                        "instructions": casual.sentence
                     };
                     pointsArray.push(pointObject);       
 

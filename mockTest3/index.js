@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     if (!mockType) {
         for (var j = 0; j < pointsOrigins.length; j++) {
             console.log(`${pointsOrigins[j].geometry.coordinates[1]},${pointsOrigins[j].geometry.coordinates[0]}`);
-            await axios.get(`https://api.nextbillion.io/h/revgeocode?key=9db15acdc3894abba50b1eb87de69822&radius=20000&at=${pointsOrigins[j].geometry.coordinates[1]},${pointsOrigins[j].geometry.coordinates[0]}&limit=1`)
+            await axios.get(`https://api.nextbillion.io/h/revgeocode?key=73d4bee8352b46e483d75fb924889ada&radius=20000&at=${pointsOrigins[j].geometry.coordinates[1]},${pointsOrigins[j].geometry.coordinates[0]}&limit=1`)
             .then((res) => {
                 addr = res.data.items[0].title;
                 var pointObject = {
@@ -51,10 +51,10 @@ exports.handler = async (event) => {
         }
     } else if (mockType === 'darp') {
         for (var j = 0; j < pointsOrigins.length; j++) {
-            await axios.get(`https://api.nextbillion.io/h/revgeocode?key=9db15acdc3894abba50b1eb87de69822&radius=20000&at=${pointsOrigins[j].geometry.coordinates[1]},${pointsOrigins[j].geometry.coordinates[0]}&limit=1`)
+            await axios.get(`https://api.nextbillion.io/h/revgeocode?key=73d4bee8352b46e483d75fb924889ada&radius=20000&at=${pointsOrigins[j].geometry.coordinates[1]},${pointsOrigins[j].geometry.coordinates[0]}&limit=1`)
             .then(async (res) => {
                 addr = res.data.items[0].title;
-                await axios.get(`https://api.nextbillion.io/h/revgeocode?key=9db15acdc3894abba50b1eb87de69822&radius=20000&at=${pointsDestinations[j].geometry.coordinates[1]},${pointsDestinations[j].geometry.coordinates[0]}&limit=1`)
+                await axios.get(`https://api.nextbillion.io/h/revgeocode?key=73d4bee8352b46e483d75fb924889ada&radius=20000&at=${pointsDestinations[j].geometry.coordinates[1]},${pointsDestinations[j].geometry.coordinates[0]}&limit=1`)
                 .then((res2) => {
                     dropoff_addr = res2.data.items[0].title;
                     var pointObject = {

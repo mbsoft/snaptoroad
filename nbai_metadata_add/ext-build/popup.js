@@ -1,3 +1,4 @@
+// Event listener to handle file selection and generate hierarchical checkboxes
 document
   .getElementById("json-file-input")
   .addEventListener("change", async (event) => {
@@ -225,11 +226,7 @@ function createBookmark(data) {
   const shiftStartInput = document.getElementById("shiftStart").value;
   const shiftEndInput = document.getElementById("shiftEnd").value;
   const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
-  const useCase = document.getElementById("usecase-select").value;
-  const maxTasks = document.getElementById("maxTasks").value;
-  const roundTrip = document.getElementById("roundtrip-checkbox");
-  const serviceTimeInput =
-    parseInt(document.getElementById("serviceTime").value, 10) || 600;
+  const serviceTimeInput = parseInt(document.getElementById("serviceTime").value, 10) || 600;
 
   let location = "";
   let loc_index = 0;
@@ -238,251 +235,56 @@ function createBookmark(data) {
   let options = {};
   let vehicles = [];
   let locations = [];
-  
   // Function to generate a random integer between min and max (inclusive)
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
-  
-  // Extract all available skills from vehicles first
-  const allVehicleSkills = [];
-  data.vehicleArray.forEach(v => {
-    if (v.attr3 && Array.isArray(v.attr3)) {
-      v.attr3.forEach(skill => {
-        if (!allVehicleSkills.includes(skill)) {
-          allVehicleSkills.push(skill);
-        }
-      });
-    }
-  });
-  
-  // Function to get a single random skill from available vehicle skills
-  function getRandomSkill() {
-    if (allVehicleSkills.length === 0) return [];
-    const randomIndex = getRandomInt(0, allVehicleSkills.length - 1);
-    const skill = allVehicleSkills[randomIndex];
-    return [skill];
-  }
-  
-  // Check if skills toggle is enabled
-  const skillsEnabled = document.getElementById("skills-checkbox").checked;
-  // Check if time windows toggle is enabled
-  const timeWindowsEnabled = document.getElementById("timewindows-checkbox").checked;
-  
-  // Function to generate a random time window within shift hours
-  function generateTimeWindow(shiftStartUnix, shiftEndUnix) {
-    if (shiftEndUnix - shiftStartUnix < 3600) {
-      return [shiftStartUnix, shiftEndUnix];
-    }
-    const latestStartTime = shiftEndUnix - 3600;
-    let randomStart = Math.floor(Math.random() * (latestStartTime - shiftStartUnix) + shiftStartUnix);
-    randomStart = Math.round(randomStart / 3600) * 3600;
-    if (randomStart < shiftStartUnix) {
-      randomStart = shiftStartUnix;
-    } else if (randomStart > latestStartTime) {
-      randomStart = Math.floor(latestStartTime / 3600) * 3600;
-    }
-    const randomEnd = randomStart + 3600;
-    return [randomStart, randomEnd];
-  }
-  
   // Process each point in pointsArray
-  if (useCase === "shipments") {
-    data.pointsArray.forEach((p) => {
-      const shiftStartUnix = Date.parse(shiftStartInput) / 1000;
-      const shiftEndUnix = Date.parse(shiftEndInput) / 1000;
-  
-      let shipment = {
-        pickup: {
-          id: p.id,
-          description: p.name,
-          location_index: loc_index++,
-          service: serviceTimeInput,
-        },
-        delivery: {
-          id: p.id,
-          description: p.business,
-          location_index: loc_index++,
-          service: serviceTimeInput,
-        },
-        amount: [getRandomInt(5, 15)],
-      };
-      
-      if (skillsEnabled) {
-        shipment.skills = getRandomSkill();
-      }
-      
-      if (timeWindowsEnabled) {
-        const pickupTimeWindow = generateTimeWindow(shiftStartUnix, shiftEndUnix - 7200);
-        shipment.pickup.time_windows = [pickupTimeWindow];
-        
-        const minTravelTime = 1800;
-        const earliestDeliveryStart = pickupTimeWindow[1] + minTravelTime;
-        
-        if (earliestDeliveryStart < shiftEndUnix - 3600) {
-          const deliveryStart = Math.min(
-            earliestDeliveryStart,
-            Math.round((shiftEndUnix - 3600) / 3600) * 3600
-          );
-          const deliveryEnd = deliveryStart + 3600;
-          shipment.delivery.time_windows = [[deliveryStart, deliveryEnd]];
-        } else {
-          const latestPossibleStart = Math.max(earliestDeliveryStart, shiftEndUnix - 3600);
-          shipment.delivery.time_windows = [[latestPossibleStart, shiftEndUnix]];
-        }
-      }
-      
-      shipments.push(shipment);
-      locations.push(`${p.pickup_latitude},${p.pickup_longitude}`);
-      locations.push(`${p.dropoff_latitude},${p.dropoff_longitude}`);
-    });
-  } else if (useCase === "jobs") {
-    data.pointsArray.forEach((p) => {
-      // Convert shift start and end times to Unix timestamps
-      const shiftStartUnix = Date.parse(shiftStartInput) / 1000;
-      const shiftEndUnix = Date.parse(shiftEndInput) / 1000;
-
-      let job = {
+  data.pointsArray.forEach((p) => {
+    let shipment = {
+      pickup: {
         id: p.id,
         description: p.name,
         location_index: loc_index++,
         service: serviceTimeInput,
-      };
-      
-      // Add skills only if skills toggle is enabled
-      if (skillsEnabled) {
-        job.skills = getRandomSkill();
-      }
-      
-      // Add time windows only if time windows toggle is enabled
-      if (timeWindowsEnabled) {
-        job.time_windows = [generateTimeWindow(shiftStartUnix, shiftEndUnix)];
-      }
-
-      jobs.push(job);
-      locations.push(`${p.pickup_latitude},${p.pickup_longitude}`);
-    });
-  } else {
-    //mixed 1/2 jobs 1/2 shipments
-    const midpoint = Math.ceil(data.pointsArray.length / 2);
-    
-    // Convert shift start and end times to Unix timestamps
-    const shiftStartUnix = Date.parse(shiftStartInput) / 1000;
-    const shiftEndUnix = Date.parse(shiftEndInput) / 1000;
-    
-    data.pointsArray.slice(0, midpoint).forEach((p) => {
-      let job = {
+      },
+      delivery: {
         id: p.id,
-        description: p.name,
+        description: p.business,
         location_index: loc_index++,
         service: serviceTimeInput,
-        amount: [getRandomInt(5, 15)], // Set a random value between 5 and 15
-      };
-      
-      // Add skills only if skills toggle is enabled
-      if (skillsEnabled) {
-        job.skills = getRandomSkill();
-      }
-      
-      // Add time windows only if time windows toggle is enabled
-      if (timeWindowsEnabled) {
-        job.time_windows = [generateTimeWindow(shiftStartUnix, shiftEndUnix)];
-      }
-      
-      jobs.push(job);
-      locations.push(`${p.pickup_latitude},${p.pickup_longitude}`);
-    });
-    data.pointsArray.slice(midpoint).forEach((p) => {
-      let shipment = {
-        pickup: {
-          id: p.id,
-          description: p.name,
-          location_index: loc_index++,
-          service: serviceTimeInput,
-        },
-        delivery: {
-          id: p.id,
-          description: p.business,
-          location_index: loc_index++,
-          service: serviceTimeInput,
-        },
-        amount: [getRandomInt(5, 15)], // Set a random value between 5 and 15
-      };
-      
-      // Add skills only if skills toggle is enabled
-      if (skillsEnabled) {
-        shipment.skills = getRandomSkill();
-      }
-      
-      // Add time windows only if time windows toggle is enabled
-      if (timeWindowsEnabled) {
-        // Generate pickup time window
-        const pickupTimeWindow = generateTimeWindow(shiftStartUnix, shiftEndUnix - 7200);
-        shipment.pickup.time_windows = [pickupTimeWindow];
-        
-        // For delivery, ensure it starts after pickup ends
-        const minTravelTime = 1800; // Assume minimum 30 minutes travel time
-        const earliestDeliveryStart = pickupTimeWindow[1] + minTravelTime;
-        
-        if (earliestDeliveryStart < shiftEndUnix - 3600) {
-          const deliveryStart = Math.min(
-            earliestDeliveryStart,
-            Math.round((shiftEndUnix - 3600) / 3600) * 3600
-          );
-          const deliveryEnd = deliveryStart + 3600;
-          shipment.delivery.time_windows = [[deliveryStart, deliveryEnd]];
-        } else {
-          const latestPossibleStart = Math.max(earliestDeliveryStart, shiftEndUnix - 3600);
-          shipment.delivery.time_windows = [[latestPossibleStart, shiftEndUnix]];
-        }
-      }
-      
-      shipments.push(shipment);
-      locations.push(`${p.pickup_latitude},${p.pickup_longitude}`);
-      locations.push(`${p.dropoff_latitude},${p.dropoff_longitude}`);
-    });
-  }
+      },
+      amount: [getRandomInt(5, 15)] // Set a random value between 5 and 15
+    };
+    shipments.push(shipment);
+    locations.push(`${p.pickup_latitude},${p.pickup_longitude}`);
+    locations.push(`${p.dropoff_latitude},${p.dropoff_longitude}`);
+  });
 
   // Process each vehicle in vehicleArray
   data.vehicleArray.forEach((f) => {
     locations.push(`${f.latitude},${f.longitude}`);
-    
     let vehicle = {
       id: f.id,
       description: f.vin,
       start_index: loc_index,
+      end_index: loc_index++,
       time_window: [
-        Date.parse(shiftStartInput) / 1000,
-        Date.parse(shiftEndInput) / 1000,
+        Date.parse(shiftStartInput) / 1000, // Use shiftStart input value
+        Date.parse(shiftEndInput) / 1000, // Use shiftEnd input value
       ],
       capacity: [f.capacity],
       skills: f.attr3,
-      costs: {
-        fixed: 3600,
-      }
     };
-    
-    if (roundTrip.checked) {
-      vehicle.end_index = loc_index;
-    }
-    loc_index++;
-    
-    if (maxTasks) {
-      vehicle.max_tasks = parseInt(maxTasks, 10);
-    }
-    
     vehicles.push(vehicle);
   });
 
   if (nbroCheckbox2.checked) {
     options = {
-      routing: {
-        mode: "car",
-        traffic_timestamp: Date.parse(shiftStartInput) / 1000
-      },
-      objective: { solver_mode: "internal" },
+      objective: { solver_mode: "internal" }
     };
   } else {
+
   }
   const bookmark = {
     locations: { id: 1, location: locations },
@@ -490,7 +292,7 @@ function createBookmark(data) {
     shipments: shipments,
     jobs: jobs,
     vehicles: vehicles,
-    options: options,
+    options: options
   };
 
   // Copy the result to the clipboard
@@ -498,9 +300,7 @@ function createBookmark(data) {
   navigator.clipboard
     .writeText(bookmarkText)
     .then(() => {
-      alert(
-        "Sample copied to clipboard - paste into the NB.ai Route Planner input panel."
-      );
+      alert("Bookmark data copied to clipboard!");
     })
     .catch((err) => {
       console.error("Failed to copy text: ", err);
@@ -508,30 +308,6 @@ function createBookmark(data) {
     });
 
   return bookmark;
-}
-
-// Modify these functions
-async function saveToCache(pointsArray, vehicleArray) {
-  try {
-    const cacheData = {
-      pointsArray,
-      vehicleArray,
-      timestamp: Date.now()
-    };
-    localStorage.setItem('nbai_route_cache', JSON.stringify(cacheData));
-  } catch (error) {
-    console.error('Error saving to cache:', error);
-  }
-}
-
-async function loadFromCache() {
-  try {
-    const cachedData = localStorage.getItem('nbai_route_cache');
-    return cachedData ? JSON.parse(cachedData) : null;
-  } catch (error) {
-    console.error('Error loading from cache:', error);
-    return null;
-  }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -573,27 +349,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     .getElementById("sample-button")
     .addEventListener("click", async () => {
       const selectedCity = citySelect.value;
-      const selectedNbr = parseInt(nbrSelect.value, 10);
-      const selectedVeh = parseInt(vehSelect.value, 10);
-      const cacheEnabled = document.getElementById("cache-checkbox").checked;
-
-      // Try to load from cache first if enabled
-      if (cacheEnabled) {
-        const cachedData = await loadFromCache();
-        if (cachedData) {
-          // Create a new object with limited arrays
-          const limitedData = {
-            pointsArray: cachedData.pointsArray.slice(0, selectedNbr),
-            vehicleArray: cachedData.vehicleArray.slice(0, selectedVeh)
-          };
-          createBookmark(limitedData);
-          return;
-        }
-      }
-
-      // If cache is disabled or no cached data exists, proceed with API call
+      const selectedNbr = nbrSelect.value;
+      const selectedVeh = vehSelect.value;
+      // Construct the API URL
       const apiUrl = `https://m4aqpzp5ah6n7ilzunwyo5ma2u0ezqcc.lambda-url.us-east-2.on.aws/?region=${selectedCity}&vehicles=${selectedVeh}&number=${selectedNbr}&type=darp`;
 
+      // Make the API request
       fetch(apiUrl)
         .then((response) => {
           if (!response.ok) {
@@ -601,10 +362,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           }
           return response.json();
         })
-        .then(async (data) => {
-          // Always save to cache when new data is retrieved, regardless of cache enabled status
-          // This ensures we always have the latest data in cache
-          await saveToCache(data.pointsArray, data.vehicleArray);
+        .then((data) => {
           createBookmark(data);
         })
         .catch((error) => {
@@ -616,12 +374,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const nbroCheckbox = document.getElementById("nbro-checkbox");
   const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
   // Disable the NBRO checkbox by default
-  nbroCheckbox.disabled = false;
-  nbroCheckbox2.disabled = false;
+  nbroCheckbox.disabled = true;
+  nbroCheckbox2.disabled = true;
+  // Request the user’s email from the background script
+  chrome.runtime.sendMessage({ action: "getUserInfo" }, (response) => {
+    if (response && response.email) {
+      const email = response.email;
 
-  // Set cache checkbox to unchecked by default
-  const cacheCheckbox = document.getElementById("cache-checkbox");
-  if (cacheCheckbox) {
-    cacheCheckbox.checked = false;
-  }
+      // Check if the email ends with 'nextbillion.ai' to enable the NBRO checkbox
+      if (email.endsWith("nextbillion.ai")) {
+        nbroCheckbox.disabled = false;
+        nbroCheckbox2.disabled = false;
+      }
+    } else {
+      console.error("No email information available.");
+    }
+  });
 });

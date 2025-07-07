@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "NextBillion.ai - TSP Integration",
+  "version": "1.06",
+  "description": "A Chrome extension to integrate with telematics provider vehicle and address data.",
+  "permissions": ["clipboardWrite"], 
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    },
+    "default_title": "NB.ai - TSP Integration"
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
