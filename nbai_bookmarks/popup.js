@@ -132,7 +132,6 @@ document
 // Event listener to handle uploading selected checkboxes
 document.getElementById("upload-button").addEventListener("click", async () => {
   const fileInput = document.getElementById("json-file-input");
-  const nbroCheckbox = document.getElementById("nbro-checkbox"); // Get the NBRO checkbox
   const file = fileInput.files[0];
 
   if (!file) {
@@ -224,12 +223,14 @@ async function getCurrentTabId() {
 function createBookmark(data) {
   const shiftStartInput = document.getElementById("shiftStart").value;
   const shiftEndInput = document.getElementById("shiftEnd").value;
-  const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
   const useCase = document.getElementById("usecase-select").value;
   const maxTasks = document.getElementById("maxTasks").value;
   const roundTrip = document.getElementById("roundtrip-checkbox");
+  const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
   const serviceTimeInput =
     parseInt(document.getElementById("serviceTime").value, 10) || 600;
+  const proximityFactor = parseInt(document.getElementById("proximityFactor").value, 10) || 0;
+  const depotEnabled = document.getElementById("depot-checkbox").checked;
 
   let location = "";
   let loc_index = 0;
@@ -238,6 +239,14 @@ function createBookmark(data) {
   let options = {};
   let vehicles = [];
   let locations = [];
+  
+  // If depot is enabled, store the first vehicle's location
+  let depotLocationIndex = -1;
+  if (depotEnabled && data.vehicleArray.length > 0) {
+    const firstVehicle = data.vehicleArray[0];
+    locations.push(`${firstVehicle.latitude},${firstVehicle.longitude}`);
+    depotLocationIndex = loc_index++;
+  }
   
   // Function to generate a random integer between min and max (inclusive)
   function getRandomInt(min, max) {
@@ -347,6 +356,7 @@ function createBookmark(data) {
         description: p.name,
         location_index: loc_index++,
         service: serviceTimeInput,
+        delivery: [getRandomInt(5, 15)]
       };
       
       // Add skills only if skills toggle is enabled
@@ -445,27 +455,50 @@ function createBookmark(data) {
 
   // Process each vehicle in vehicleArray
   data.vehicleArray.forEach((f) => {
-    locations.push(`${f.latitude},${f.longitude}`);
+    if (!depotEnabled) {
+      // If depot is disabled, add each vehicle's unique location
+      locations.push(`${f.latitude},${f.longitude}`);
+    }
     
     let vehicle = {
       id: f.id,
       description: f.vin,
-      start_index: loc_index,
+      start_index: depotEnabled ? depotLocationIndex : loc_index,
       time_window: [
         Date.parse(shiftStartInput) / 1000,
         Date.parse(shiftEndInput) / 1000,
       ],
-      capacity: [f.capacity],
+      capacity: [500],
       skills: f.attr3,
       costs: {
         fixed: 3600,
       }
     };
+
+    // Add HOS configuration based on selection
+    const hosValue = document.getElementById("hos-select").value;
+    if (hosValue !== 'none') {
+      const hosConfigs = {
+        0: { max_continuous_driving: 36000, layover_duration: 7200, include_service_time: true },    // USFed607LH
+        1: { max_continuous_driving: 28800, layover_duration: 7200, include_service_time: true },    // USFed708LH
+        2: { max_continuous_driving: 36000, layover_duration: 7200, include_service_time: true },    // CanadaCycle1
+        3: { max_continuous_driving: 28800, layover_duration: 7200, include_service_time: true },    // CanadaCycle2
+        4: { max_continuous_driving: 28800, layover_duration: 7200, include_service_time: true },    // California808
+        5: { max_continuous_driving: 25200, layover_duration: 7200, include_service_time: true },    // Texas707
+        6: { max_continuous_driving: 14400, layover_duration: 7200, include_service_time: true },    // USShortHaul
+        7: { max_continuous_driving: 25200, layover_duration: 7200, include_service_time: true }     // Europe
+      };
+      
+      vehicle.drive_time_layover_config = hosConfigs[parseInt(hosValue)];
+    }
     
     if (roundTrip.checked) {
-      vehicle.end_index = loc_index;
+      vehicle.end_index = depotEnabled ? depotLocationIndex : loc_index;
     }
-    loc_index++;
+    
+    if (!depotEnabled) {
+      loc_index++; // Only increment location index if not using depot
+    }
     
     if (maxTasks) {
       vehicle.max_tasks = parseInt(maxTasks, 10);
@@ -474,16 +507,40 @@ function createBookmark(data) {
     vehicles.push(vehicle);
   });
 
+  // Modify the options section
   if (nbroCheckbox2.checked) {
     options = {
       routing: {
         mode: "car",
         traffic_timestamp: Date.parse(shiftStartInput) / 1000
       },
-      objective: { solver_mode: "internal" },
+      objective: { 
+        custom: {
+          "type": "min",
+          "value": "vehicles"
+        },
+        solver_mode: "internal" 
+      },
+      grouping: {
+        proximity_factor: proximityFactor
+      }
     };
   } else {
+    options = {
+      objective: { 
+        custom: {
+          "type": "min",
+          "value": "vehicles"
+        },
+        solver_mode: "internal" 
+      },
+      grouping: {
+        proximity_factor: proximityFactor
+      }
+    };
   }
+
+
   const bookmark = {
     locations: { id: 1, location: locations },
     location_index: loc_index,
@@ -510,12 +567,29 @@ function createBookmark(data) {
   return bookmark;
 }
 
-// Modify these functions
-async function saveToCache(pointsArray, vehicleArray) {
+// Modify the saveToCache function to store all parameters
+async function saveToCache(data) {
   try {
     const cacheData = {
-      pointsArray,
-      vehicleArray,
+      pointsArray: data.pointsArray,
+      vehicleArray: data.vehicleArray,
+      parameters: {
+        shiftStart: document.getElementById("shiftStart").value,
+        shiftEnd: document.getElementById("shiftEnd").value,
+        serviceTime: document.getElementById("serviceTime").value,
+        maxTasks: document.getElementById("maxTasks").value,
+        proximityFactor: document.getElementById("proximityFactor").value,
+        useCase: document.getElementById("usecase-select").value,
+        selectedCity: document.getElementById("city-select").value,
+        selectedNbr: document.getElementById("nbr-select").value,
+        selectedVeh: document.getElementById("veh-select").value,
+        selectedHos: document.getElementById("hos-select").value,
+        // Checkboxes
+        skills: document.getElementById("skills-checkbox").checked,
+        timeWindows: document.getElementById("timewindows-checkbox").checked,
+        roundTrip: document.getElementById("roundtrip-checkbox").checked,
+        depot: document.getElementById("depot-checkbox").checked,
+      },
       timestamp: Date.now()
     };
     localStorage.setItem('nbai_route_cache', JSON.stringify(cacheData));
@@ -602,9 +676,8 @@ document.addEventListener("DOMContentLoaded", async () => {
           return response.json();
         })
         .then(async (data) => {
-          // Always save to cache when new data is retrieved, regardless of cache enabled status
-          // This ensures we always have the latest data in cache
-          await saveToCache(data.pointsArray, data.vehicleArray);
+          // Always save to cache when new data is retrieved
+          await saveToCache(data);
           createBookmark(data);
         })
         .catch((error) => {
@@ -613,15 +686,42 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-  const nbroCheckbox = document.getElementById("nbro-checkbox");
-  const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
-  // Disable the NBRO checkbox by default
-  nbroCheckbox.disabled = false;
-  nbroCheckbox2.disabled = false;
-
+    const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
+    // Disable the NBRO checkbox by default
+    nbroCheckbox2.disabled = false;
   // Set cache checkbox to unchecked by default
   const cacheCheckbox = document.getElementById("cache-checkbox");
   if (cacheCheckbox) {
     cacheCheckbox.checked = false;
   }
+
+  // Add event listener for cache checkbox
+  cacheCheckbox.addEventListener('change', async function() {
+    if (this.checked) {
+      const cachedData = await loadFromCache();
+      if (cachedData && cachedData.parameters) {
+        // Restore all input values
+        document.getElementById("shiftStart").value = cachedData.parameters.shiftStart;
+        document.getElementById("shiftEnd").value = cachedData.parameters.shiftEnd;
+        document.getElementById("serviceTime").value = cachedData.parameters.serviceTime;
+        document.getElementById("maxTasks").value = cachedData.parameters.maxTasks;
+        document.getElementById("proximityFactor").value = cachedData.parameters.proximityFactor;
+        document.getElementById("usecase-select").value = cachedData.parameters.useCase;
+        document.getElementById("city-select").value = cachedData.parameters.selectedCity;
+        document.getElementById("nbr-select").value = cachedData.parameters.selectedNbr;
+        document.getElementById("veh-select").value = cachedData.parameters.selectedVeh;
+        document.getElementById("hos-select").value = cachedData.parameters.selectedHos;
+        
+        // Restore checkbox states
+        document.getElementById("skills-checkbox").checked = cachedData.parameters.skills;
+        document.getElementById("timewindows-checkbox").checked = cachedData.parameters.timeWindows;
+        document.getElementById("roundtrip-checkbox").checked = cachedData.parameters.roundTrip;
+        document.getElementById("depot-checkbox").checked = cachedData.parameters.depot;
+      }
+    }
+  });
+
+  // Initialize depot checkbox state
+  const depotCheckbox = document.getElementById("depot-checkbox");
+  depotCheckbox.checked = false; // Default to disabled
 });

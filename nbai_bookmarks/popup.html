@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NB.ai Route Optimization Sample Loader</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="popup.css">
     <style>
       /* Styling for logo */
       .logo {
@@ -76,10 +77,7 @@
     <div id="checkbox-container"></div>
     <div id="button-container">
       <button id="upload-button">Upload and Store</button>
-      <label id="nbro-label">
-        <input type="checkbox" id="nbro-checkbox" checked />
-        NBRO
-      </label>
+
     </div>
 
     <!-- Horizontal divider -->
@@ -99,6 +97,7 @@
       <option value="bangalore">Bangalore</option>
       <option value="berlin">Berlin</option>
       <option value="chennai">Chennai</option>
+      <option value="charlotte">Charlotte</option>
       <option value="chicago" selected>Chicago</option>
       <option value="columbus">Columbus</option>
       <option value="dallas">Dallas</option>
@@ -111,6 +110,7 @@
       <option value="hyderabad">Hyderabad</option>      
       <option value="london">London</option>
       <option value="mexico">Mexico City</option>
+      <option value="minneapolis">Minneapolis</option>
       <option value="newyork">New York</option>
       <option value="oslo">Oslo</option>
       <option value="paris">Paris</option>
@@ -123,6 +123,7 @@
       <option value="telaviv">Tel Aviv</option>
       <option value="toronto">Toronto</option>
       <option value="usa">USA - Long Distance</option>
+      <option value="eu">Europe - Long Distance</option>
     </select>
     
     <label for="usecase-select">Use case:</label>
@@ -160,8 +161,27 @@
 
     <label for="maxTasks">Max Tasks:</label>
     <input type="number" id="maxTasks" value="12" min="0" style="width: 50px;" /><br /><br />
-    <!-- <label for="maxDistance">Max Distance(km):</label> -->
-    <!-- <input type="number" id="maxDistance" value="25" min="0" style="width: 50px;" /><br /><br /> -->
+
+    <div>
+      <label for="proximityFactor">Proximity Factor (0-10):</label>
+      <input type="number" id="proximityFactor" min="0" max="10" value="0">
+    </div>
+    <br />
+    <div>
+      <label for="hos-select">HOS - Hours of Service:</label>
+      <select id="hos-select">
+        <option value="none">None</option>
+        <option value="0">USFed607LH</option>
+        <option value="1">USFed708LH</option>
+        <option value="2">CanadaCycle1</option>
+        <option value="3">CanadaCycle2</option>
+        <option value="4">California808</option>
+        <option value="5">Texas707</option>
+        <option value="6">USShortHaul</option>
+        <option value="7">Europe</option>
+      </select>
+    </div>
+    <br /><br />
     <label id="roundtrip-label">
       <input type="checkbox" id="roundtrip-checkbox" checked />
       Roundtrip
@@ -179,9 +199,16 @@
       Time Windows
     </label>
     <div>
+      <input type="checkbox" id="depot-checkbox">
+      <label for="depot-checkbox">Vehicle Depot</label>
+    </div>
+    <br /><br />
+    <div>
       <input type="checkbox" id="cache-checkbox" checked>
       <label for="cache-checkbox">Cache enable</label>
     </div>
+
+
 
     <button id="sample-button">Copy Sample to Clipboard</button>
     <script src="popup.js"></script>
