@@ -101,7 +101,7 @@ jobs:
         test -f route_analysis_report.pdf || exit 1
         
     - name: Upload test artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-outputs
