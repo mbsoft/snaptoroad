@@ -5,7 +5,7 @@ module.exports = {
     jest: true
   },
   extends: [
-    'standard'
+    'eslint:recommended'
   ],
   parserOptions: {
     ecmaVersion: 12,
@@ -30,7 +30,6 @@ module.exports = {
     'keyword-spacing': 'error',
     'space-infix-ops': 'error',
     'eol-last': 'error',
-    'no-trailing-spaces': 'error',
     'no-multiple-empty-lines': ['error', { 'max': 1 }]
   },
   overrides: [
