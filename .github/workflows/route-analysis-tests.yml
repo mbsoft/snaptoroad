@@ -5,12 +5,12 @@ on:
     branches: [ main, master ]
     paths:
       - 'route_analysis/**'
-      - '.github/workflows/test.yml'
+      - '.github/workflows/route-analysis-tests.yml'
   pull_request:
     branches: [ main, master ]
     paths:
       - 'route_analysis/**'
-      - '.github/workflows/test.yml'
+      - '.github/workflows/route-analysis-tests.yml'
 
 jobs:
   test:

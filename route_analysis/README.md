@@ -1,6 +1,6 @@
 # Mobility Route Analysis & Reporting System
 
-[![Tests](https://github.com/mbsoft/nbai_examples/workflows/Route%20Analysis%20Tests/badge.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/test.yml)
+[![Tests](https://github.com/mbsoft/nbai_examples/workflows/Route%20Analysis%20Tests/badge.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/route-analysis-tests.yml)
 [![Node.js CI](https://img.shields.io/badge/node-16.x%20%7C%2018.x%20%7C%2020.x-brightgreen.svg)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/test.yml)
