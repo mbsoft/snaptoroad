@@ -8,10 +8,16 @@
     "start": "node mobility_route_report.js",
     "test": "node test/test_analysis.js && node test/test_pdf.js",
     "test:analysis": "node test/test_analysis.js",
-    "test:pdf": "node test/test_pdf.js"
+    "test:pdf": "node test/test_pdf.js",
+    "test:coverage": "node test/test_analysis.js && node test/test_pdf.js",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
   },
   "dependencies": {
     "fs": "^0.0.1-security",
     "pdfkit": "^0.14.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
   }
 }

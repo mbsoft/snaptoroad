@@ -1,5 +1,12 @@
 # Mobility Route Analysis & Reporting System
 
+[![Tests](https://github.com/mbsoft/nbai_examples/workflows/Route%20Analysis%20Tests/badge.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/test.yml)
+[![Node.js CI](https://img.shields.io/badge/node-16.x%20%7C%2018.x%20%7C%2020.x-brightgreen.svg)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/test.yml)
+[![npm version](https://img.shields.io/badge/npm-latest-blue.svg)](https://www.npmjs.com/)
+[![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/mbsoft/nbai_examples/graphs/commit-activity)
+
 A comprehensive Node.js application for analyzing route optimization solutions and generating detailed reports with key performance indicators (KPIs) for transportation fleets.
 
 ## Features

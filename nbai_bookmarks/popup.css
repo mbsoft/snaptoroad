@@ -1,0 +1,40 @@
+/* Import Mulish font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400&display=swap');
+
+/* Apply Mulish font to all elements */
+* {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+h2 {
+  font-size: 18px;
+  line-height: 1.5;
+}
+/* Ensure form elements also use Mulish */
+input, 
+select, 
+button, 
+textarea,
+label {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+/* Maintain consistent font in checkboxes and their labels */
+.checkbox-container {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Ensure dropdown menus maintain the font */
+option {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+} 

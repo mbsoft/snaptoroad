@@ -1,0 +1,112 @@
+name: Route Analysis Tests
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'route_analysis/**'
+      - '.github/workflows/test.yml'
+  pull_request:
+    branches: [ main, master ]
+    paths:
+      - 'route_analysis/**'
+      - '.github/workflows/test.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: route_analysis/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd route_analysis
+        npm ci
+        
+    - name: Run tests
+      run: |
+        cd route_analysis
+        npm test
+        
+    - name: Run test coverage
+      run: |
+        cd route_analysis
+        npm run test:coverage
+        
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: route_analysis/coverage/lcov.info
+        flags: route-analysis
+        name: route-analysis-coverage
+        fail_ci_if_error: false
+        
+    - name: Run linting
+      run: |
+        cd route_analysis
+        npm run lint
+        
+    - name: Check for security vulnerabilities
+      run: |
+        cd route_analysis
+        npm audit --audit-level moderate
+        
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+        cache-dependency-path: route_analysis/package-lock.json
+        
+    - name: Install dependencies
+      run: |
+        cd route_analysis
+        npm ci
+        
+    - name: Run integration tests
+      run: |
+        cd route_analysis
+        node test/run_tests.js
+        
+    - name: Generate PDF report test
+      run: |
+        cd route_analysis
+        node mobility_route_report.js test_mobility_solution.json test_vehicles.json
+        
+    - name: Verify output files
+      run: |
+        cd route_analysis
+        test -f route_analysis_results.json || exit 1
+        test -f route_analysis_report.pdf || exit 1
+        
+    - name: Upload test artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-outputs
+        path: |
+          route_analysis/route_analysis_results.json
+          route_analysis/route_analysis_report.pdf
+          route_analysis/coverage/
+        retention-days: 7 

@@ -1,60 +1,80 @@
-// Main test runner for mobility route analysis
+#!/usr/bin/env node
 
-import { runAllTests } from './test_analysis.js';
-import { runPDFTests } from './test_pdf.js';
-import { cleanupTempFiles } from './test_utils.js';
+/**
+ * Test runner for route analysis module
+ * This script runs all test files and provides a summary
+ */
 
-async function runAllTestSuites() {
-    console.log('🚀 Starting Mobility Route Analysis Test Suite\n');
-    console.log('=' .repeat(60));
-    
-    let totalTests = 0;
-    let passedTests = 0;
-    let failedTests = 0;
-    
-    try {
-        // Run analysis tests
-        console.log('\n📊 Running Analysis Tests...');
-        console.log('-'.repeat(40));
-        runAllTests();
-        passedTests += 9; // Number of analysis tests
-        totalTests += 9;
-        
-        // Run PDF tests
-        console.log('\n📄 Running PDF Generation Tests...');
-        console.log('-'.repeat(40));
-        await runPDFTests();
-        passedTests += 4; // Number of PDF tests
-        totalTests += 4;
-        
-        console.log('\n' + '='.repeat(60));
-        console.log('🎉 ALL TESTS PASSED!');
-        console.log(`📈 Test Summary: ${passedTests}/${totalTests} tests passed`);
-        console.log('='.repeat(60));
-        
-    } catch (error) {
-        console.log('\n' + '='.repeat(60));
-        console.log('❌ TEST SUITE FAILED');
-        console.log(`📈 Test Summary: ${passedTests}/${totalTests} tests passed`);
-        console.log(`💥 Error: ${error.message}`);
-        console.log('='.repeat(60));
-        
-        // Clean up any temporary files
-        cleanupTempFiles();
-        
-        process.exit(1);
-    } finally {
-        // Always clean up
-        cleanupTempFiles();
-    }
+import { execSync } from 'child_process'
+import fs from 'fs'
+import path from 'path'
+
+const testFiles = [
+  'test_analysis.js',
+  'test_pdf.js'
+]
+
+console.log('🚀 Starting Route Analysis Test Suite...\n')
+
+let passedTests = 0
+let failedTests = 0
+const results = []
+
+// Run each test file
+for (const testFile of testFiles) {
+  const testPath = path.join(process.cwd(), 'test', testFile)
+
+  if (!fs.existsSync(testPath)) {
+    console.log(`❌ Test file not found: ${testFile}`)
+    failedTests++
+    results.push({ file: testFile, status: 'NOT_FOUND' })
+    continue
+  }
+
+  try {
+    console.log(`📋 Running ${testFile}...`)
+    execSync(`node ${testPath}`, {
+      stdio: 'inherit',
+      cwd: process.cwd()
+    })
+    console.log(`✅ ${testFile} passed\n`)
+    passedTests++
+    results.push({ file: testFile, status: 'PASSED' })
+  } catch (error) {
+    console.log(`❌ ${testFile} failed\n`)
+    failedTests++
+    results.push({ file: testFile, status: 'FAILED', error: error.message })
+  }
 }
 
-// Run all tests if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-    runAllTestSuites().catch(error => {
-        console.error('Test suite execution failed:', error);
-        process.exit(1);
-    });
-}
+// Print summary
+console.log('📊 Test Summary:')
+console.log('================')
+console.log(`Total Tests: ${testFiles.length}`)
+console.log(`Passed: ${passedTests}`)
+console.log(`Failed: ${failedTests}`)
+console.log(`Success Rate: ${Math.round((passedTests / testFiles.length) * 100)}%`)
 
-export { runAllTestSuites }; 
+// Print detailed results
+console.log('\n📋 Detailed Results:')
+console.log('===================')
+results.forEach(result => {
+  const status = result.status === 'PASSED'
+    ? '✅'
+    : result.status === 'FAILED'
+      ? '❌'
+      : '⚠️'
+  console.log(`${status} ${result.file}: ${result.status}`)
+  if (result.error) {
+    console.log(`   Error: ${result.error}`)
+  }
+})
+
+// Exit with appropriate code
+if (failedTests > 0) {
+  console.log('\n❌ Some tests failed. Exiting with code 1.')
+  process.exit(1)
+} else {
+  console.log('\n🎉 All tests passed!')
+  process.exit(0)
+}
