@@ -1,9 +1,19 @@
 // Tests for PDF generation functionality
 
 import { generatePDFReport } from '../pdf_generator.js'
-import { sampleVehicleData } from './test_data.js'
 import { assertFileExists } from './test_utils.js'
 import fs from 'fs'
+
+const sampleVehicleData = {
+  2638: {
+    capacity: [3, 1],
+    totalCapacity: 4
+  },
+  2462: {
+    capacity: [8, 2],
+    totalCapacity: 10
+  }
+}
 
 function testPDFGeneration () {
   const results = [
@@ -139,8 +149,7 @@ function testPDFWithLargeVehicleData () {
   const largeVehicleData = {}
   for (let i = 1; i <= 100; i++) {
     largeVehicleData[`vehicle${i}`] = {
-      ambulatorySlots: 8,
-      wcSlots: 2,
+      capacity: [8, 2],
       totalCapacity: 10
     }
   }

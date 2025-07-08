@@ -48,19 +48,19 @@ export function generatePDFReport (results, overallSummary, vehicleCapacities) {
 
   const summaryData = [
     ['Metric', 'Value'],
-    ['Total Routes', overallSummary.totalRoutes.toString()],
-    ['Unassigned Trips', overallSummary.unassignedTrips.toString()],
-    ['Total Trips', overallSummary.totalTrips.toString()],
-    ['Total Miles', `${Math.round(overallSummary.totalMiles)}`],
-    ['Total Revenue Miles', `${Math.round(overallSummary.totalRevenueMiles)}`],
-    ['Total Empty Miles', `${Math.round(overallSummary.totalEmptyMiles)}`],
-    ['Average Load %', `${Math.round(overallSummary.averageLoadPercentage * 100) / 100}%`],
-    ['Total Ambulatory Passengers', overallSummary.totalAmbulatoryPassengers.toString()],
-    ['Total WC Passengers', overallSummary.totalWcPassengers.toString()],
-    ['Total Passengers', overallSummary.totalPassengers.toString()],
-    ['Overall Passengers per Hour', `${Math.round(overallSummary.passengersPerHour * 100) / 100}`],
-    ['Average Miles per Route', `${Math.round((overallSummary.totalMiles / overallSummary.totalRoutes))}`],
-    ['Average Passengers per Route', `${Math.round((overallSummary.totalPassengers / overallSummary.totalRoutes))}`]
+    ['Total Routes', (overallSummary.totalRoutes ?? 0).toString()],
+    ['Unassigned Trips', (overallSummary.unassignedTrips ?? 0).toString()],
+    ['Total Trips', (overallSummary.totalTrips ?? 0).toString()],
+    ['Total Miles', `${Math.round(overallSummary.totalMiles ?? 0)}`],
+    ['Total Revenue Miles', `${Math.round(overallSummary.totalRevenueMiles ?? 0)}`],
+    ['Total Empty Miles', `${Math.round(overallSummary.totalEmptyMiles ?? 0)}`],
+    ['Average Load %', `${Math.round((overallSummary.averageLoadPercentage ?? 0) * 100) / 100}%`],
+    ['Total Ambulatory Passengers', (overallSummary.totalAmbulatoryPassengers ?? 0).toString()],
+    ['Total WC Passengers', (overallSummary.totalWcPassengers ?? 0).toString()],
+    ['Total Passengers', (overallSummary.totalPassengers ?? 0).toString()],
+    ['Overall Passengers per Hour', `${Math.round((overallSummary.passengersPerHour ?? 0) * 100) / 100}`],
+    ['Average Miles per Route', `${Math.round((overallSummary.totalMiles ?? 0) / (overallSummary.totalRoutes ?? 1))}`],
+    ['Average Passengers per Route', `${Math.round((overallSummary.totalPassengers ?? 0) / (overallSummary.totalRoutes ?? 1))}`]
   ]
 
   drawTable(doc, summaryData, 50, doc.y, 500, 12)
