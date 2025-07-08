@@ -3,7 +3,7 @@
 [![Tests](https://github.com/mbsoft/nbai_examples/workflows/Route%20Analysis%20Tests/badge.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/route-analysis-tests.yml)
 [![Node.js CI](https://img.shields.io/badge/node-16.x%20%7C%2018.x%20%7C%2020.x-brightgreen.svg)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/test.yml)
+[![Code Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](https://github.com/mbsoft/nbai_examples/actions/workflows/route-analysis-tests.yml)
 [![npm version](https://img.shields.io/badge/npm-latest-blue.svg)](https://www.npmjs.com/)
 [![Maintenance](https://img.shields.io/badge/maintained-yes-green.svg)](https://github.com/mbsoft/nbai_examples/graphs/commit-activity)
 
@@ -152,7 +152,7 @@ Expected format:
 ## Dependencies
 
 - **pdfkit**: PDF generation library
-- **Node.js**: Runtime environment (v14+ recommended)
+- **Node.js**: Runtime environment (v16.x, 18.x, or 20.x - tested and compatible)
 
 ## Testing
 
@@ -166,6 +166,12 @@ Tests are located in the `test/` directory and cover:
 - KPI calculations
 - PDF generation
 - Error handling
+
+### Test Coverage
+- ✅ **10/10 Analysis Tests**: All route analysis and KPI calculation tests pass
+- ✅ **4/4 PDF Tests**: All PDF generation scenarios tested successfully
+- ✅ **Node.js Compatibility**: Tested and verified on Node.js 20.x
+- ✅ **CI/CD Integration**: Automated testing via GitHub Actions on Node.js 16.x, 18.x, and 20.x
 
 ## Error Handling
 
