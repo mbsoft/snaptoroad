@@ -14,8 +14,8 @@ function formatDuration (seconds) {
 // Helper function to convert Unix timestamp to readable time
 function formatTime (timestamp) {
   const date = new Date(timestamp * 1000) // Convert to milliseconds
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
+  const hours = date.getUTCHours()
+  const minutes = date.getUTCMinutes()
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
 }
 

@@ -40,13 +40,13 @@ function testMetersToMiles () {
 }
 
 function testFormatTime () {
-  // Test with a known timestamp (7:30 AM)
+  // Test with a known timestamp (11:30 AM UTC)
   const timestamp = 1712489400
-  assertEqual(formatTime(timestamp), '07:30', 'Should format timestamp to 24-hour time')
+  assertEqual(formatTime(timestamp), '11:30', 'Should format timestamp to 24-hour UTC time')
 
-  // Test with 2:30 PM (7:30 AM + 7 hours = 2:30 PM)
-  const timestamp2 = 1712489400 + (7 * 3600) // 7:30 AM + 7 hours = 2:30 PM
-  assertEqual(formatTime(timestamp2), '14:30', 'Should format PM time correctly')
+  // Test with 6:30 PM UTC (11:30 AM + 7 hours = 6:30 PM)
+  const timestamp2 = 1712489400 + (7 * 3600) // 11:30 AM + 7 hours = 6:30 PM UTC
+  assertEqual(formatTime(timestamp2), '18:30', 'Should format PM time correctly')
 }
 
 function testParseVehicleCapacities () {

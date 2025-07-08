@@ -101,8 +101,8 @@ export const sampleCSVContent = `vehicle_id,start_location_latitude,start_locati
 
 export const expectedRoute1KPIs = {
   routeDescription: 'Route 1 - Vehicle 2638',
-  startTime: '07:30',
-  endTime: '09:30',
+  startTime: '11:30',
+  endTime: '13:30',
   totalMiles: 15.53,
   revenueMiles: 6.21,
   emptyMiles: 9.32,
@@ -115,8 +115,8 @@ export const expectedRoute1KPIs = {
 
 export const expectedRoute2KPIs = {
   routeDescription: 'Route 2 - Vehicle 2462',
-  startTime: '07:30',
-  endTime: '10:30',
+  startTime: '11:30',
+  endTime: '14:30',
   totalMiles: 24.85,
   revenueMiles: 18.64,
   emptyMiles: 15.53,
