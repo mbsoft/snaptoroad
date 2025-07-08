@@ -20,7 +20,6 @@ import {
 import {
   assertEqual,
   assertApproxEqual,
-  assertObjectEqual,
   createTempFile,
   cleanupTempFiles,
   runTests
