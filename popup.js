@@ -607,6 +607,85 @@ async function loadFromCache() {
   }
 }
 
+function downloadCSV(data, cityName, useCase) {
+  // Generate a route name (using city name or a default)
+  const routeName = cityName.toUpperCase();
+  
+  // CSV header
+  const headers = ['Route', 'ID Code', 'Address', 'Business', 'Code Type', 'Task Type', 'Location'];
+  let csvContent = headers.join(',') + '\n';
+  
+  // Function to escape CSV fields
+  const escapeCSV = (field) => {
+    if (field === null || field === undefined) return '';
+    const str = String(field);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  };
+  
+  // Generate rows from pointsArray
+  data.pointsArray.forEach((point, index) => {
+    const idCode = `D-${index + 1}`;
+    
+    if (useCase === 'shipments' || (useCase === 'mixed' && index >= Math.ceil(data.pointsArray.length / 2))) {
+      // For shipments, create two rows: pickup and delivery
+      
+      // Pickup row
+      const pickupRow = [
+        escapeCSV(routeName),
+        escapeCSV(idCode),
+        escapeCSV(point.address || `${point.pickup_latitude}, ${point.pickup_longitude}`),
+        escapeCSV(point.business || 'FALSE'),
+        escapeCSV('P'),
+        escapeCSV('Pickup'),
+        escapeCSV(`${point.pickup_latitude},${point.pickup_longitude}`)
+      ];
+      csvContent += pickupRow.join(',') + '\n';
+      
+      // Delivery row
+      const deliveryRow = [
+        escapeCSV(routeName),
+        escapeCSV(idCode),
+        escapeCSV(point.address || `${point.dropoff_latitude}, ${point.dropoff_longitude}`),
+        escapeCSV(point.business || 'FALSE'),
+        escapeCSV('D'),
+        escapeCSV('Delivery'),
+        escapeCSV(`${point.dropoff_latitude},${point.dropoff_longitude}`)
+      ];
+      csvContent += deliveryRow.join(',') + '\n';
+    } else {
+      // For jobs, create one delivery row
+      const row = [
+        escapeCSV(routeName),
+        escapeCSV(idCode),
+        escapeCSV(point.address || `${point.pickup_latitude}, ${point.pickup_longitude}`),
+        escapeCSV(point.business || 'FALSE'),
+        escapeCSV('D'),
+        escapeCSV('Delivery'),
+        escapeCSV(`${point.pickup_latitude},${point.pickup_longitude}`)
+      ];
+      csvContent += row.join(',') + '\n';
+    }
+  });
+  
+  // Create blob and download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${cityName}_jobs.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  alert(`CSV file "${cityName}_jobs.csv" has been downloaded.`);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   // Set initial values for shiftStart and shiftEnd
   const shiftStartInput = document.getElementById("shiftStart");
@@ -727,4 +806,49 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize depot checkbox state
   const depotCheckbox = document.getElementById("depot-checkbox");
   depotCheckbox.checked = false; // Default to disabled
+
+  // Download CSV button handler
+  document
+    .getElementById("download-csv-button")
+    .addEventListener("click", async () => {
+      const selectedCity = citySelect.value;
+      const selectedNbr = parseInt(nbrSelect.value, 10);
+      const selectedVeh = parseInt(vehSelect.value, 10);
+      const cacheEnabled = document.getElementById("cache-checkbox").checked;
+      const useCase = document.getElementById("usecase-select").value;
+
+      // Try to load from cache first if enabled
+      if (cacheEnabled) {
+        const cachedData = await loadFromCache();
+        if (cachedData) {
+          // Create a new object with limited arrays
+          const limitedData = {
+            pointsArray: cachedData.pointsArray.slice(0, selectedNbr),
+            vehicleArray: cachedData.vehicleArray.slice(0, selectedVeh)
+          };
+          downloadCSV(limitedData, selectedCity, useCase);
+          return;
+        }
+      }
+
+      // If cache is disabled or no cached data exists, proceed with API call
+      const apiUrl = `https://m4aqpzp5ah6n7ilzunwyo5ma2u0ezqcc.lambda-url.us-east-2.on.aws/?region=${selectedCity}&vehicles=${selectedVeh}&number=${selectedNbr}&type=darp`;
+
+      fetch(apiUrl)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(async (data) => {
+          // Always save to cache when new data is retrieved
+          await saveToCache(data);
+          downloadCSV(data, selectedCity, useCase);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          alert("Failed to fetch data. Please try again.");
+        });
+    });
 });
