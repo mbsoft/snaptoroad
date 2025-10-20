@@ -132,7 +132,6 @@ document
 // Event listener to handle uploading selected checkboxes
 document.getElementById("upload-button").addEventListener("click", async () => {
   const fileInput = document.getElementById("json-file-input");
-  const nbroCheckbox = document.getElementById("nbro-checkbox"); // Get the NBRO checkbox
   const file = fileInput.files[0];
 
   if (!file) {
@@ -224,12 +223,12 @@ async function getCurrentTabId() {
 function createBookmark(data) {
   const shiftStartInput = document.getElementById("shiftStart").value;
   const shiftEndInput = document.getElementById("shiftEnd").value;
-  const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
   const useCase = document.getElementById("usecase-select").value;
   const maxTasks = document.getElementById("maxTasks").value;
   const roundTrip = document.getElementById("roundtrip-checkbox");
+  const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
   const serviceTimeInput =
-    parseInt(document.getElementById("serviceTime").value, 10) || 600;
+    (parseInt(document.getElementById("serviceTime").value, 10) || 10) * 60; // Convert minutes to seconds
   const proximityFactor = parseInt(document.getElementById("proximityFactor").value, 10) || 0;
   const depotEnabled = document.getElementById("depot-checkbox").checked;
 
@@ -469,7 +468,7 @@ function createBookmark(data) {
         Date.parse(shiftStartInput) / 1000,
         Date.parse(shiftEndInput) / 1000,
       ],
-      capacity: [f.capacity],
+      capacity: [500],
       skills: f.attr3,
       costs: {
         fixed: 3600,
@@ -541,6 +540,7 @@ function createBookmark(data) {
     };
   }
 
+
   const bookmark = {
     locations: { id: 1, location: locations },
     location_index: loc_index,
@@ -585,7 +585,6 @@ async function saveToCache(data) {
         selectedVeh: document.getElementById("veh-select").value,
         selectedHos: document.getElementById("hos-select").value,
         // Checkboxes
-        nbro: document.getElementById("nbro-checkbox2").checked,
         skills: document.getElementById("skills-checkbox").checked,
         timeWindows: document.getElementById("timewindows-checkbox").checked,
         roundTrip: document.getElementById("roundtrip-checkbox").checked,
@@ -609,7 +608,256 @@ async function loadFromCache() {
   }
 }
 
+function downloadCSV(data, cityName, useCase) {
+  // Generate a route name (using city name or a default)
+  const routeName = cityName.toUpperCase();
+  
+  // CSV header
+  const headers = ['Route', 'ID Code', 'Address', 'Business', 'Code Type', 'Task Type', 'Location'];
+  let csvContent = headers.join(',') + '\n';
+  
+  // Function to escape CSV fields
+  const escapeCSV = (field) => {
+    if (field === null || field === undefined) return '';
+    const str = String(field);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  };
+  
+  // Generate rows from pointsArray
+  data.pointsArray.forEach((point, index) => {
+    const idCode = `D-${index + 1}`;
+    
+    if (useCase === 'shipments' || (useCase === 'mixed' && index >= Math.ceil(data.pointsArray.length / 2))) {
+      // For shipments, create two rows: pickup and delivery
+      
+      // Pickup row
+      const pickupRow = [
+        escapeCSV(routeName),
+        escapeCSV(idCode),
+        escapeCSV(point.address || `${point.pickup_latitude}, ${point.pickup_longitude}`),
+        escapeCSV(point.business || 'FALSE'),
+        escapeCSV('P'),
+        escapeCSV('Pickup'),
+        escapeCSV(`${point.pickup_latitude},${point.pickup_longitude}`)
+      ];
+      csvContent += pickupRow.join(',') + '\n';
+      
+      // Delivery row
+      const deliveryRow = [
+        escapeCSV(routeName),
+        escapeCSV(idCode),
+        escapeCSV(point.address || `${point.dropoff_latitude}, ${point.dropoff_longitude}`),
+        escapeCSV(point.business || 'FALSE'),
+        escapeCSV('D'),
+        escapeCSV('Delivery'),
+        escapeCSV(`${point.dropoff_latitude},${point.dropoff_longitude}`)
+      ];
+      csvContent += deliveryRow.join(',') + '\n';
+    } else {
+      // For jobs, create one delivery row
+      const row = [
+        escapeCSV(routeName),
+        escapeCSV(idCode),
+        escapeCSV(point.address || `${point.pickup_latitude}, ${point.pickup_longitude}`),
+        escapeCSV(point.business || 'FALSE'),
+        escapeCSV('D'),
+        escapeCSV('Delivery'),
+        escapeCSV(`${point.pickup_latitude},${point.pickup_longitude}`)
+      ];
+      csvContent += row.join(',') + '\n';
+    }
+  });
+  
+  // Create blob and download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${cityName}_jobs.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  console.log(`CSV file "${cityName}_jobs.csv" has been downloaded.`);
+}
+
+function downloadVehiclesCSV(data, cityName) {
+  // Get shift start and end times from the form
+  const shiftStartInput = document.getElementById("shiftStart").value;
+  const shiftEndInput = document.getElementById("shiftEnd").value;
+  
+  // CSV header for vehicles
+  const headers = ['Vehicle ID', 'VIN', 'Latitude', 'Longitude', 'Skills', 'Start Time', 'End Time', 'Location'];
+  let csvContent = headers.join(',') + '\n';
+  
+  // Function to escape CSV fields
+  const escapeCSV = (field) => {
+    if (field === null || field === undefined) return '';
+    const str = String(field);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  };
+  
+  // Generate rows from vehicleArray
+  data.vehicleArray.forEach((vehicle, index) => {
+    const skills = vehicle.attr3 && Array.isArray(vehicle.attr3) ? vehicle.attr3.join(',') : '';
+    
+    const row = [
+      escapeCSV(vehicle.id || `VEH-${index + 1}`),
+      escapeCSV(vehicle.vin || ''),
+      escapeCSV(vehicle.latitude),
+      escapeCSV(vehicle.longitude),
+      escapeCSV(skills), // Will be quoted if contains commas
+      escapeCSV(shiftStartInput),
+      escapeCSV(shiftEndInput),
+      escapeCSV(`${vehicle.latitude},${vehicle.longitude}`)
+    ];
+    csvContent += row.join(',') + '\n';
+  });
+  
+  // Create blob and download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${cityName}_vehicles.csv`);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  console.log(`CSV file "${cityName}_vehicles.csv" has been downloaded.`);
+}
+
+// City data organized by region
+const cityData = {
+  'north-america': [
+    { value: 'chicago', label: 'Chicago' },
+    { value: 'charlotte', label: 'Charlotte' },
+    { value: 'columbus', label: 'Columbus' },
+    { value: 'dallas', label: 'Dallas' },
+    { value: 'dublin', label: 'Dublin, OH' },
+    { value: 'houston', label: 'Houston' },
+    { value: 'la', label: 'Los Angeles' },
+    { value: 'mexico', label: 'Mexico City' },
+    { value: 'minneapolis', label: 'Minneapolis' },
+    { value: 'newyork', label: 'New York' },
+    { value: 'seattle', label: 'Seattle' },
+    { value: 'toronto', label: 'Toronto' }
+  ],
+  'europe': [
+    { value: 'berlin', label: 'Berlin' },
+    { value: 'hamburg', label: 'Hamburg' },
+    { value: 'helsinki', label: 'Helsinki' },
+    { value: 'london', label: 'London' },
+    { value: 'oslo', label: 'Oslo' },
+    { value: 'paris', label: 'Paris' },
+    { value: 'czech', label: 'Prague' }
+  ],
+  'asia-pacific': [
+    { value: 'bangalore', label: 'Bangalore' },
+    { value: 'chennai', label: 'Chennai' },
+    { value: 'delhi', label: 'Delhi' },
+    { value: 'dubai', label: 'Dubai' },
+    { value: 'hyderabad', label: 'Hyderabad' },
+    { value: 'singapore', label: 'Singapore' },
+    { value: 'sydney', label: 'Sydney' },
+    { value: 'telaviv', label: 'Tel Aviv' }
+  ],
+  'south-america': [
+    { value: 'saopaulo', label: 'São Paulo' },
+    { value: 'santiago', label: 'Santiago' }
+  ],
+  'long-distance': [
+    { value: 'usa', label: 'USA - Long Distance' },
+    { value: 'eu', label: 'Europe - Long Distance' }
+  ]
+};
+
+// Populate cities based on selected region
+function populateCities(region, selectedCity = null) {
+  const citySelect = document.getElementById('city-select');
+  const cities = cityData[region] || [];
+  
+  citySelect.innerHTML = '';
+  
+  cities.forEach((city, index) => {
+    const option = document.createElement('option');
+    option.value = city.value;
+    option.textContent = city.label;
+    
+    // Select chicago by default for north-america, or first city for others, or the specified city
+    if (selectedCity && city.value === selectedCity) {
+      option.selected = true;
+    } else if (!selectedCity && ((region === 'north-america' && city.value === 'chicago') || index === 0)) {
+      option.selected = true;
+    }
+    
+    citySelect.appendChild(option);
+  });
+}
+
+// Sync multi-select options with hidden checkboxes
+function syncOptionsSelect() {
+  const optionsSelect = document.getElementById('options-select');
+  const selectedValues = Array.from(optionsSelect.selectedOptions).map(opt => opt.value);
+  
+  // Update hidden checkboxes based on multi-select
+  document.getElementById('roundtrip-checkbox').checked = selectedValues.includes('roundtrip');
+  document.getElementById('nbro-checkbox2').checked = selectedValues.includes('traffic');
+  document.getElementById('skills-checkbox').checked = selectedValues.includes('skills');
+  document.getElementById('timewindows-checkbox').checked = selectedValues.includes('timewindows');
+  document.getElementById('depot-checkbox').checked = selectedValues.includes('depot');
+  document.getElementById('cache-checkbox').checked = selectedValues.includes('cache');
+  
+  // Update selected options display text
+  updateSelectedOptionsDisplay();
+}
+
+// Update the display text showing selected options
+function updateSelectedOptionsDisplay() {
+  const optionsSelect = document.getElementById('options-select');
+  const selectedOptionsText = document.getElementById('selected-options-text');
+  
+  const selectedOptions = Array.from(optionsSelect.selectedOptions).map(opt => opt.textContent);
+  
+  if (selectedOptions.length > 0) {
+    selectedOptionsText.textContent = '(' + selectedOptions.join(', ') + ')';
+  } else {
+    selectedOptionsText.textContent = '(None selected)';
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize cascading region/city selectors
+  const regionSelect = document.getElementById('region-select');
+  if (regionSelect) {
+    // Populate cities for the default region
+    populateCities(regionSelect.value);
+    
+    // Add event listener for region changes
+    regionSelect.addEventListener('change', (e) => {
+      populateCities(e.target.value);
+    });
+  }
+  
+  // Add event listener for options multi-select
+  const optionsSelect = document.getElementById('options-select');
+  if (optionsSelect) {
+    optionsSelect.addEventListener('change', syncOptionsSelect);
+    // Initial sync
+    syncOptionsSelect();
+  }
   // Set initial values for shiftStart and shiftEnd
   const shiftStartInput = document.getElementById("shiftStart");
   const shiftEndInput = document.getElementById("shiftEnd");
@@ -687,13 +935,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-  const nbroCheckbox = document.getElementById("nbro-checkbox");
-  const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
-  // Disable the NBRO checkbox by default
-  nbroCheckbox.disabled = false;
-  nbroCheckbox2.disabled = false;
-
-  // Set cache checkbox to unchecked by default
+    const nbroCheckbox2 = document.getElementById("nbro-checkbox2");
+    // Disable the NBRO checkbox by default
+    nbroCheckbox2.disabled = false;
+  // Set cache checkbox to unchecked by default (changed from original default)
   const cacheCheckbox = document.getElementById("cache-checkbox");
   if (cacheCheckbox) {
     cacheCheckbox.checked = false;
@@ -717,16 +962,80 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("hos-select").value = cachedData.parameters.selectedHos;
         
         // Restore checkbox states
-        document.getElementById("nbro-checkbox2").checked = cachedData.parameters.nbro;
         document.getElementById("skills-checkbox").checked = cachedData.parameters.skills;
         document.getElementById("timewindows-checkbox").checked = cachedData.parameters.timeWindows;
         document.getElementById("roundtrip-checkbox").checked = cachedData.parameters.roundTrip;
         document.getElementById("depot-checkbox").checked = cachedData.parameters.depot;
+        
+        // Update multi-select to match checkboxes
+        const optionsSelect = document.getElementById('options-select');
+        const selectedOptions = [];
+        if (cachedData.parameters.roundTrip) selectedOptions.push('roundtrip');
+        if (cachedData.parameters.skills) selectedOptions.push('skills');
+        if (cachedData.parameters.timeWindows) selectedOptions.push('timewindows');
+        if (cachedData.parameters.depot) selectedOptions.push('depot');
+        selectedOptions.push('cache'); // Always select cache when loading from cache
+        
+        Array.from(optionsSelect.options).forEach(option => {
+          option.selected = selectedOptions.includes(option.value);
+        });
+        
+        // Update the display text
+        updateSelectedOptionsDisplay();
       }
     }
   });
 
-  // Initialize depot checkbox state
+  // Initialize depot checkbox state - now enabled by default
   const depotCheckbox = document.getElementById("depot-checkbox");
-  depotCheckbox.checked = false; // Default to disabled
+  depotCheckbox.checked = true; // Default to enabled
+
+  // Download CSV button handler
+  document
+    .getElementById("download-csv-button")
+    .addEventListener("click", async () => {
+      const selectedCity = citySelect.value;
+      const selectedNbr = parseInt(nbrSelect.value, 10);
+      const selectedVeh = parseInt(vehSelect.value, 10);
+      const cacheEnabled = document.getElementById("cache-checkbox").checked;
+      const useCase = document.getElementById("usecase-select").value;
+
+      // Try to load from cache first if enabled
+      if (cacheEnabled) {
+        const cachedData = await loadFromCache();
+        if (cachedData) {
+          // Create a new object with limited arrays
+          const limitedData = {
+            pointsArray: cachedData.pointsArray.slice(0, selectedNbr),
+            vehicleArray: cachedData.vehicleArray.slice(0, selectedVeh)
+          };
+          downloadCSV(limitedData, selectedCity, useCase);
+          downloadVehiclesCSV(limitedData, selectedCity);
+          alert(`CSV files downloaded: "${selectedCity}_jobs.csv" and "${selectedCity}_vehicles.csv"`);
+          return;
+        }
+      }
+
+      // If cache is disabled or no cached data exists, proceed with API call
+      const apiUrl = `https://m4aqpzp5ah6n7ilzunwyo5ma2u0ezqcc.lambda-url.us-east-2.on.aws/?region=${selectedCity}&vehicles=${selectedVeh}&number=${selectedNbr}&type=darp`;
+
+      fetch(apiUrl)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(async (data) => {
+          // Always save to cache when new data is retrieved
+          await saveToCache(data);
+          downloadCSV(data, selectedCity, useCase);
+          downloadVehiclesCSV(data, selectedCity);
+          alert(`CSV files downloaded: "${selectedCity}_jobs.csv" and "${selectedCity}_vehicles.csv"`);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+          alert("Failed to fetch data. Please try again.");
+        });
+    });
 });

@@ -1,222 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=650, initial-scale=1.0" />
     <title>NB.ai Route Optimization Sample Loader</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="popup.css">
-    <style>
-      /* Styling for logo */
-      .logo {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 40px;
-        height: 40px;
-      }
-
-      /* Adjust content to not overlap with logo */
-      body {
-        padding-left: 60px; /* Adds padding so content does not overlap with logo */
-      }
-
-      /* Styling for category headers */
-      .category {
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-      }
-
-      /* Caret icon for categories */
-      .caret {
-        margin-right: 10px;
-        transition: transform 0.3s ease;
-      }
-
-      /* Initially hide sub-items */
-      .sub-items {
-        display: none;
-        margin-left: 20px;
-      }
-
-      /* Rotate caret for expanded state */
-      .expanded .caret {
-        transform: rotate(90deg);
-      }
-
-      /* Adds spacing between the container and button */
-      #checkbox-container {
-        margin-bottom: 15px;
-      }
-      /* Add 5px margin below the button */
-      #upload-button {
-        margin-bottom: 15px;
-      }
-      #sample-button {
-        margin-bottom: 15px;
-        margin-top: 10px;
-      }
-      #download-csv-button {
-        margin-bottom: 15px;
-        margin-top: 10px;
-        margin-left: 10px;
-      }
-      /* Divider styling */
-      .divider {
-        margin: 20px 0;
-        border-bottom: 1px solid #ccc;
-      }
-    </style>
   </head>
   <body>
     <!-- Logo at the top-left corner -->
     <img src="logo.png" class="logo" alt="Logo" />
 
-    <h2>Route Planner Bookmarks</h2>
-    <label for="json-file-input">Upload JSON File:</label>
-    <input type="file" id="json-file-input" accept=".json" title="Choose a JSON file to upload" /><br /><br />
+    <!-- Create Sample Section -->
+    <div class="section-card">
+      <h2>Create Sample</h2>
+      <!-- Two Column Layout -->
+      <div class="form-group">
+        <div class="two-column-grid">
+          <!-- Row 1: Region and City (cascading selectors) - Full width row -->
+          <div class="full-width">
+            <div class="inline-pair">
+              <div>
+                <label for="region-select">Region</label>
+                <select id="region-select">
+                  <option value="north-america" selected>🇺🇸 North America</option>
+                  <option value="europe">🇪🇺 Europe</option>
+                  <option value="asia-pacific">🌏 Asia & Pacific</option>
+                  <option value="south-america">🌎 South America</option>
+                  <option value="long-distance">🗺️ Long Distance</option>
+                </select>
+              </div>
+              <div>
+                <label for="city-select">City</label>
+                <select id="city-select">
+                  <!-- Cities will be populated by JavaScript -->
+                </select>
+              </div>
+            </div>
+          </div>
 
-    <div id="checkbox-container"></div>
-    <div id="button-container">
-      <button id="upload-button">Upload and Store</button>
+          <!-- Row 2: Shift Start and Shift End - Full width row -->
+          <div class="full-width">
+            <div class="inline-pair">
+              <div>
+                <label for="shiftStart">Shift Start</label>
+                <input type="datetime-local" id="shiftStart" />
+              </div>
+              <div>
+                <label for="shiftEnd">Shift End</label>
+                <input type="datetime-local" id="shiftEnd" />
+              </div>
+            </div>
+          </div>
 
+          <!-- Row 3: Use Case, Jobs/Shipments, and Vehicles/Techs -->
+          <div>
+            <label for="usecase-select">Use Case</label>
+            <select id="usecase-select">
+              <option value="shipments">Shipments</option>
+              <option value="jobs" selected>Jobs</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+          <div>
+            <label for="nbr-select">Jobs/Shipments</label>
+            <select id="nbr-select">
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100" selected>100</option>
+              <option value="200">200</option>
+              <option value="1000">1000</option>
+            </select>
+          </div>
+          <div>
+            <label for="veh-select">Vehicles/Techs</label>
+            <select id="veh-select">
+              <option value="1">1</option>   
+              <option value="5">5</option>
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="500">500</option>
+              <option value="1000">1000</option>
+            </select>
+          </div>
+
+          <!-- Row 4: Service Time, Max Tasks, and Proximity Factor -->
+          <div>
+            <label for="serviceTime">Service Time (min)</label>
+            <input type="number" id="serviceTime" value="10" min="0" />
+          </div>
+          <div>
+            <label for="maxTasks">Max Tasks</label>
+            <input type="number" id="maxTasks" value="25" min="0" />
+          </div>
+          <div>
+            <label for="proximityFactor">Proximity Factor (0-10)</label>
+            <input type="number" id="proximityFactor" min="0" max="10" value="0">
+          </div>
+
+          <!-- Row 6: Hours of Service (full width) -->
+          <div class="full-width">
+            <label for="hos-select">Hours of Service (HOS)</label>
+            <select id="hos-select">
+              <option value="none">None</option>
+              <option value="0">USFed607LH</option>
+              <option value="1">USFed708LH</option>
+              <option value="2">CanadaCycle1</option>
+              <option value="3">CanadaCycle2</option>
+              <option value="4">California808</option>
+              <option value="5">Texas707</option>
+              <option value="6">USShortHaul</option>
+              <option value="7">Europe</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Options Multi-Select -->
+      <div class="form-group">
+        <div class="options-header">
+          <label for="options-select">Options</label>
+          <span id="selected-options-text" class="selected-options-display"></span>
+        </div>
+        <select id="options-select" multiple size="6">
+          <option value="roundtrip" selected>Roundtrip</option>
+          <option value="traffic">Traffic Timestamp</option>
+          <option value="skills">Enable Skills</option>
+          <option value="timewindows" selected>Time Windows</option>
+          <option value="depot" selected>Vehicle Depot</option>
+          <option value="cache">Cache Enable</option>
+        </select>
+        <div class="helper-text">Hold Ctrl/Cmd to select multiple options</div>
+      </div>
+
+      <!-- Hidden checkboxes for backward compatibility with existing JS -->
+      <div class="hidden-checkboxes">
+        <input type="checkbox" id="roundtrip-checkbox" checked />
+        <input type="checkbox" id="nbro-checkbox2" />
+        <input type="checkbox" id="skills-checkbox" />
+        <input type="checkbox" id="timewindows-checkbox" checked />
+        <input type="checkbox" id="depot-checkbox" checked />
+        <input type="checkbox" id="cache-checkbox" />
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <button id="sample-button">Copy Sample to Clipboard</button>
+        <button id="download-csv-button">Download CSV</button>
+      </div>
     </div>
 
-    <!-- Horizontal divider -->
-    <div class="divider"></div>
-    <h2>Create Sample</h2>
-    <!-- Date selectors for shiftStart and shiftEnd on the same row -->
-    <label for="shiftStart">Shift Start:</label>
-    <input type="datetime-local" id="shiftStart" style="margin-right: 15px;" />
-    
-    <label for="shiftEnd">Shift End:</label>
-    <input type="datetime-local" id="shiftEnd" /><br /><br />
+    <!-- Bookmarks Section -->
+    <div class="section-card">
+      <h2>Route Planner Bookmarks</h2>
+      <div class="file-input-wrapper">
+        <label class="file-input-label" for="json-file-input">Upload JSON File</label>
+        <input type="file" id="json-file-input" accept=".json" title="Choose a JSON file to upload" />
+      </div>
 
-    <!-- Combined row for city, use case, and jobs/shipments -->
-    <label for="city-select">City:</label>
-    <select id="city-select" style="width: 100px; margin-right: 15px;">
-      <option value="la">Los Angeles</option>
-      <option value="bangalore">Bangalore</option>
-      <option value="berlin">Berlin</option>
-      <option value="chennai">Chennai</option>
-      <option value="charlotte">Charlotte</option>
-      <option value="chicago" selected>Chicago</option>
-      <option value="columbus">Columbus</option>
-      <option value="dallas">Dallas</option>
-      <option value="delhi">Delhi</option>
-      <option value="dubai">Dubai</option>
-      <option value="dublin">Dublin, OH</option>
-      <option value="hamburg">Hamburg</option>
-      <option value="helsinki">Helsinki</option>
-      <option value="houston">Houston</option>
-      <option value="hyderabad">Hyderabad</option>      
-      <option value="london">London</option>
-      <option value="mexico">Mexico City</option>
-      <option value="minneapolis">Minneapolis</option>
-      <option value="newyork">New York</option>
-      <option value="oslo">Oslo</option>
-      <option value="paris">Paris</option>
-      <option value="czech">Prague</option>
-      <option value="saopaulo">São Paulo</option>
-      <option value="santiago">Santiago</option>
-      <option value="singapore">Singapore</option>
-      <option value="seattle">Seattle</option>
-      <option value="sydney">Sydney</option>
-      <option value="telaviv">Tel Aviv</option>
-      <option value="toronto">Toronto</option>
-      <option value="usa">USA - Long Distance</option>
-      <option value="eu">Europe - Long Distance</option>
-    </select>
-    
-    <label for="usecase-select">Use case:</label>
-    <select id="usecase-select" style="margin-right: 15px;">
-      <option value="shipments">Shipments</option>
-      <option value="jobs" selected>Jobs</option>
-      <option value="mixed">Mixed</option>
-    </select>
-    
-    <label for="nbr-select">Jobs/Shipments:</label>
-    <select id="nbr-select" style="width: 60px;">
-      <option value="10">10</option>
-      <option value="50">50</option>
-      <option value="100" selected>100</option>
-      <option value="200">200</option>
-      <option value="1000">1000</option>
-    </select><br /><br />
-
-    <!-- Combined row for vehicles, service time, and max tasks -->
-    <label for="veh-select">Nbr veh/techs:</label>
-    <select id="veh-select" style="width: 50px; margin-right: 15px;" >
-      <option value="1">1</option>   
-      <option value="5">5</option>
-      <option value="10" selected>10</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-      <option value="200">200</option>
-      <option value="500">500</option>
-      <option value="1000">1000</option>
-    </select>
-
-    <label for="serviceTime">Service Time (s):</label>
-    <input type="number" id="serviceTime" value="600" min="0" style="width: 60px; margin-right: 15px;" />
-
-    <label for="maxTasks">Max Tasks:</label>
-    <input type="number" id="maxTasks" value="12" min="0" style="width: 50px;" /><br /><br />
-
-    <div>
-      <label for="proximityFactor">Proximity Factor (0-10):</label>
-      <input type="number" id="proximityFactor" min="0" max="10" value="0">
-    </div>
-    <br />
-    <div>
-      <label for="hos-select">HOS - Hours of Service:</label>
-      <select id="hos-select">
-        <option value="none">None</option>
-        <option value="0">USFed607LH</option>
-        <option value="1">USFed708LH</option>
-        <option value="2">CanadaCycle1</option>
-        <option value="3">CanadaCycle2</option>
-        <option value="4">California808</option>
-        <option value="5">Texas707</option>
-        <option value="6">USShortHaul</option>
-        <option value="7">Europe</option>
-      </select>
-    </div>
-    <br /><br />
-    <label id="roundtrip-label">
-      <input type="checkbox" id="roundtrip-checkbox" checked />
-      Roundtrip
-    </label>
-    <label id="nbro-label2">
-      <input type="checkbox" id="nbro-checkbox2" />
-      Traffic Timestamp
-    </label>
-    <label id="skills-label">
-      <input type="checkbox" id="skills-checkbox" />
-      Enable Skills
-    </label>
-    <label id="timewindows-label">
-      <input type="checkbox" id="timewindows-checkbox" />
-      Time Windows
-    </label>
-    <div>
-      <input type="checkbox" id="depot-checkbox">
-      <label for="depot-checkbox">Vehicle Depot</label>
-    </div>
-    <br /><br />
-    <div>
-      <input type="checkbox" id="cache-checkbox" checked>
-      <label for="cache-checkbox">Cache enable</label>
+      <div id="checkbox-container"></div>
+      
+      <div id="button-container">
+        <button id="upload-button">Upload and Store</button>
+      </div>
     </div>
 
-
-
-    <button id="sample-button">Copy Sample to Clipboard</button>
-    <button id="download-csv-button">Download CSV</button>
     <script src="popup.js"></script>
   </body>
 </html>

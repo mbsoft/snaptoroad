@@ -1,40 +1,239 @@
-/* Import Mulish font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Mulish:wght@400&display=swap');
+/* Material Design specific styles for popup */
 
-/* Apply Mulish font to all elements */
-* {
-  font-family: 'Mulish', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.5;
+/* Section Cards */
+.section-card {
+  background: white;
+  margin: 12px 16px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-h2 {
-  font-size: 18px;
-  line-height: 1.5;
-}
-/* Ensure form elements also use Mulish */
-input, 
-select, 
-button, 
-textarea,
-label {
-  font-family: 'Mulish', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.5;
-/* Maintain consistent font in checkboxes and their labels */
-.checkbox-container {
-  font-family: 'Mulish', sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.5;
+.section-card h2 {
+  margin: 0 0 16px 0;
+  padding: 0;
+  color: #1976d2;
 }
 
-/* Ensure dropdown menus maintain the font */
-option {
-  font-family: 'Mulish', sans-serif;
+/* Form field groups */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.form-row > * {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Multi-Column Grid Layout */
+.two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 12px 12px;
+  margin-bottom: 12px;
+  justify-content: start;
+}
+
+.two-column-grid .full-width {
+  grid-column: 1 / -1;
+  max-width: 100%;
+}
+
+.two-column-grid > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.two-column-grid input,
+.two-column-grid select {
+  width: 100%;
+  min-width: 120px;
+}
+
+/* Checkbox groups */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.checkbox-wrapper:hover {
+  background: #e3f2fd;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  margin: 0 8px 0 0;
+}
+
+.checkbox-wrapper label {
+  margin: 0;
+  cursor: pointer;
   font-weight: 400;
+  color: #424242;
+}
+
+/* Button group styling */
+.button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+/* Compact select styling for inline forms */
+.compact-select {
+  min-width: 100px;
+}
+
+/* File input special styling */
+.file-input-wrapper {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.file-input-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #424242;
+}
+
+/* Specific width overrides for number inputs */
+#serviceTime,
+#maxTasks,
+#proximityFactor {
+  max-width: 100px;
+}
+
+/* HOS select full width */
+#hos-select {
+  width: 100%;
+}
+
+.hos-select-wrapper {
+  flex: 2;
+}
+
+/* Specific input widths - keep them compact but flexible */
+#shiftStart,
+#shiftEnd {
+  max-width: 220px;
+}
+
+#city-select {
+  max-width: 200px;
+}
+
+#usecase-select {
+  max-width: 150px;
+}
+
+#nbr-select {
+  max-width: 140px;
+}
+
+#veh-select {
+  max-width: 140px;
+}
+
+#serviceTime,
+#proximityFactor {
+  max-width: 140px;
+}
+
+/* Multi-select styling */
+select[multiple] {
+  padding: 8px;
+  min-height: 150px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
-  line-height: 1.5;
+  background: white;
+}
+
+select[multiple]:focus {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+  outline: none;
+}
+
+select[multiple] option {
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 2px 0;
+}
+
+select[multiple] option:checked {
+  background: linear-gradient(0deg, #1976d2 0%, #1976d2 100%);
+  color: white;
+}
+
+select[multiple] option:hover {
+  background: #e3f2fd;
+}
+
+/* Helper text */
+.helper-text {
+  font-size: 12px;
+  color: #757575;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* Hidden checkboxes for backward compatibility */
+.hidden-checkboxes {
+  display: none;
+}
+
+/* Inline pair - for keeping two items on the same line */
+.inline-pair {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.inline-pair > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.inline-pair input,
+.inline-pair select {
+  width: 100%;
+}
+
+/* Options header with selected display */
+.options-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.selected-options-display {
+  font-size: 12px;
+  color: #1976d2;
+  font-weight: 500;
+  flex: 1;
 } 
