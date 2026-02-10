@@ -18,6 +18,7 @@ export default function Home() {
   const [edgeMidPoints, setEdgeMidPoints] = useState<[number, number][]>([]);
   const [edgeInfoList, setEdgeInfoList] = useState<EdgeInfo[]>([]);
   const [selectedEdgeIndex, setSelectedEdgeIndex] = useState<number | null>(null);
+  const [apiRequestUrl, setApiRequestUrl] = useState<string | null>(null);
   const [apiResponse, setApiResponse] = useState<object | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,11 +40,12 @@ export default function Home() {
       setSelectedEdgeIndex(null);
 
       try {
-        const { response, decodedRoute, edgeBreakPoints: breaks, edgeMidPoints: mids, edgeInfoList: edges } = await fetchSnapToRoad(
+        const { requestUrl, response, decodedRoute, edgeBreakPoints: breaks, edgeMidPoints: mids, edgeInfoList: edges } = await fetchSnapToRoad(
           pts,
           apiKey,
           controller.signal
         );
+        setApiRequestUrl(requestUrl);
         setApiResponse(response);
         setSnappedRoute(decodedRoute);
         setEdgeBreakPoints(breaks);
@@ -52,6 +54,7 @@ export default function Home() {
       } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') return;
         setError(err instanceof Error ? err.message : 'Unknown error');
+        setApiRequestUrl(null);
         setApiResponse(null);
         setSnappedRoute(null);
         setEdgeBreakPoints(null);
@@ -95,6 +98,7 @@ export default function Home() {
     setEdgeMidPoints([]);
     setEdgeInfoList([]);
     setSelectedEdgeIndex(null);
+    setApiRequestUrl(null);
     setApiResponse(null);
     setError(null);
     counterRef.current = 0;
@@ -117,6 +121,7 @@ export default function Home() {
           setEdgeMidPoints([]);
           setEdgeInfoList([]);
           setSelectedEdgeIndex(null);
+          setApiRequestUrl(null);
           setApiResponse(null);
           setError(null);
         }
@@ -172,6 +177,7 @@ export default function Home() {
             </div>
           )}
           <JsonResponsePanel
+            requestUrl={apiRequestUrl}
             response={apiResponse}
             isLoading={isLoading}
             error={error}

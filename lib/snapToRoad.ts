@@ -6,6 +6,7 @@ export async function fetchSnapToRoad(
   apiKey: string,
   signal?: AbortSignal
 ): Promise<{
+  requestUrl: string;
   response: SnapToRoadResponse;
   decodedRoute: [number, number][];
   edgeBreakPoints: [number, number][];
@@ -26,7 +27,8 @@ export async function fetchSnapToRoad(
   url.searchParams.set('detail', 'true');
   url.searchParams.set('debug', 'true');
 
-  const res = await fetch(url.toString(), { signal });
+  const requestUrl = url.toString();
+  const res = await fetch(requestUrl, { signal });
   if (!res.ok) {
     throw new Error(`Snap-to-road API error: ${res.status} ${res.statusText}`);
   }
@@ -70,5 +72,5 @@ export async function fetchSnapToRoad(
     return decodedRoute[midIdx];
   });
 
-  return { response: data, decodedRoute, edgeBreakPoints, edgeMidPoints, edgeInfoList };
+  return { requestUrl, response: data, decodedRoute, edgeBreakPoints, edgeMidPoints, edgeInfoList };
 }
