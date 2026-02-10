@@ -7,6 +7,8 @@ import { MapPoint } from '@/lib/types';
 
 const ROUTE_SOURCE = 'snapped-route';
 const ROUTE_LAYER = 'snapped-route-line';
+const EDGE_SEGMENTS_SOURCE = 'edge-segments';
+const EDGE_SEGMENTS_LAYER = 'edge-segments-hit';
 const EDGE_BREAKS_SOURCE = 'edge-breaks';
 const EDGE_BREAKS_LAYER = 'edge-breaks-dots';
 const SELECTED_EDGE_SOURCE = 'selected-edge';
@@ -17,6 +19,7 @@ interface MapViewProps {
   points: MapPoint[];
   snappedRoute: [number, number][] | null;
   edgeBreakPoints: [number, number][] | null;
+  edgeOffsets: number[];
   edgeMidPoints: [number, number][];
   selectedEdgeIndex: number | null;
   onMapClick: (lat: number, lng: number) => void;
@@ -29,6 +32,7 @@ export default function MapView({
   points,
   snappedRoute,
   edgeBreakPoints,
+  edgeOffsets,
   edgeMidPoints,
   selectedEdgeIndex,
   onMapClick,
@@ -74,87 +78,23 @@ export default function MapView({
     });
 
     map.on('click', (e: maplibregl.MapMouseEvent) => {
-      // Ignore right-clicks (handled by contextmenu)
       if (e.originalEvent.button !== 0) return;
-      // Check if click hit an edge break dot
-      if (map.getLayer(EDGE_BREAKS_LAYER)) {
-        const features = map.queryRenderedFeatures(e.point, {
-          layers: [EDGE_BREAKS_LAYER],
-        });
-        if (features.length > 0) {
-          const edgeIdx = features[0].properties?.edgeIndex;
-          if (edgeIdx !== undefined) {
-            onEdgeSelectRef.current(edgeIdx);
-          }
-          return;
-        }
-      }
-      onEdgeSelectRef.current(null);
       onMapClickRef.current(e.lngLat.lat, e.lngLat.lng);
     });
 
-    // Right-click to inspect edge info
-    map.on('contextmenu', (e: maplibregl.MapMouseEvent) => {
-      e.preventDefault();
-
-      // Check if right-click hit an edge dot directly
-      if (map.getLayer(EDGE_BREAKS_LAYER)) {
-        const dotFeatures = map.queryRenderedFeatures(e.point, {
-          layers: [EDGE_BREAKS_LAYER],
-        });
-        if (dotFeatures.length > 0) {
-          const edgeIdx = dotFeatures[0].properties?.edgeIndex;
-          if (edgeIdx !== undefined) {
-            onEdgeSelectRef.current(edgeIdx);
-          }
-          return;
-        }
-      }
-
-      // Check if right-click hit the route line, find nearest edge dot
-      if (map.getLayer(ROUTE_LAYER) && map.getLayer(EDGE_BREAKS_LAYER)) {
-        const routeFeatures = map.queryRenderedFeatures(e.point, {
-          layers: [ROUTE_LAYER],
-        });
-        if (routeFeatures.length > 0) {
-          // Query all edge dots within a wider radius and pick the closest
-          const bbox: [maplibregl.PointLike, maplibregl.PointLike] = [
-            [e.point.x - 50, e.point.y - 50],
-            [e.point.x + 50, e.point.y + 50],
-          ];
-          const nearbyDots = map.queryRenderedFeatures(bbox, {
-            layers: [EDGE_BREAKS_LAYER],
-          });
-          if (nearbyDots.length > 0) {
-            // Find closest dot by screen distance
-            let closest = nearbyDots[0];
-            let minDist = Infinity;
-            for (const f of nearbyDots) {
-              const coords = (f.geometry as GeoJSON.Point).coordinates;
-              const projected = map.project([coords[0], coords[1]]);
-              const dx = projected.x - e.point.x;
-              const dy = projected.y - e.point.y;
-              const dist = dx * dx + dy * dy;
-              if (dist < minDist) {
-                minDist = dist;
-                closest = f;
-              }
-            }
-            const edgeIdx = closest.properties?.edgeIndex;
-            if (edgeIdx !== undefined) {
-              onEdgeSelectRef.current(edgeIdx);
-            }
-            return;
-          }
+    // Hover on edge segments to show details
+    map.on('mousemove', EDGE_SEGMENTS_LAYER, (e) => {
+      if (e.features && e.features.length > 0) {
+        const edgeIdx = e.features[0].properties?.edgeIndex;
+        if (edgeIdx !== undefined) {
+          onEdgeSelectRef.current(edgeIdx);
+          map.getCanvas().style.cursor = 'pointer';
         }
       }
     });
 
-    // Pointer cursor on hover over edge dots
-    map.on('mouseenter', EDGE_BREAKS_LAYER, () => {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-    map.on('mouseleave', EDGE_BREAKS_LAYER, () => {
+    map.on('mouseleave', EDGE_SEGMENTS_LAYER, () => {
+      onEdgeSelectRef.current(null);
       map.getCanvas().style.cursor = '';
     });
 
@@ -263,6 +203,64 @@ export default function MapView({
       map.on('load', updateRoute);
     }
   }, [snappedRoute]);
+
+  // Render per-edge segments (invisible wide hit area for hover detection)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    function update() {
+      if (map!.getLayer(EDGE_SEGMENTS_LAYER)) {
+        map!.removeLayer(EDGE_SEGMENTS_LAYER);
+      }
+      if (map!.getSource(EDGE_SEGMENTS_SOURCE)) {
+        map!.removeSource(EDGE_SEGMENTS_SOURCE);
+      }
+
+      if (!snappedRoute || snappedRoute.length === 0 || edgeOffsets.length === 0) return;
+
+      const features = edgeOffsets.map((startIdx, i) => {
+        const endIdx = i + 1 < edgeOffsets.length
+          ? edgeOffsets[i + 1]
+          : snappedRoute.length - 1;
+        // Slice the route from this edge's start to the next edge's start (inclusive)
+        const coords = snappedRoute
+          .slice(startIdx, endIdx + 1)
+          .map(([lat, lng]) => [lng, lat]);
+
+        return {
+          type: 'Feature' as const,
+          properties: { edgeIndex: i },
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: coords,
+          },
+        };
+      });
+
+      map!.addSource(EDGE_SEGMENTS_SOURCE, {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features },
+      });
+
+      // Transparent wide line for easy hover hit detection
+      map!.addLayer({
+        id: EDGE_SEGMENTS_LAYER,
+        type: 'line',
+        source: EDGE_SEGMENTS_SOURCE,
+        paint: {
+          'line-color': 'transparent',
+          'line-width': 16,
+        },
+      });
+    }
+
+    if (mapLoadedRef.current) {
+      update();
+    } else {
+      map.on('load', update);
+    }
+  }, [snappedRoute, edgeOffsets]);
 
   // Render edge break point dots (black boundary dots)
   useEffect(() => {

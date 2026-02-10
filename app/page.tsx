@@ -15,6 +15,7 @@ export default function Home() {
     null
   );
   const [edgeBreakPoints, setEdgeBreakPoints] = useState<[number, number][] | null>(null);
+  const [edgeOffsets, setEdgeOffsets] = useState<number[]>([]);
   const [edgeMidPoints, setEdgeMidPoints] = useState<[number, number][]>([]);
   const [edgeInfoList, setEdgeInfoList] = useState<EdgeInfo[]>([]);
   const [selectedEdgeIndex, setSelectedEdgeIndex] = useState<number | null>(null);
@@ -40,7 +41,7 @@ export default function Home() {
       setSelectedEdgeIndex(null);
 
       try {
-        const { requestUrl, response, decodedRoute, edgeBreakPoints: breaks, edgeMidPoints: mids, edgeInfoList: edges } = await fetchSnapToRoad(
+        const { requestUrl, response, decodedRoute, edgeBreakPoints: breaks, edgeOffsets: ofs, edgeMidPoints: mids, edgeInfoList: edges } = await fetchSnapToRoad(
           pts,
           apiKey,
           controller.signal
@@ -49,6 +50,7 @@ export default function Home() {
         setApiResponse(response);
         setSnappedRoute(decodedRoute);
         setEdgeBreakPoints(breaks);
+        setEdgeOffsets(ofs);
         setEdgeMidPoints(mids);
         setEdgeInfoList(edges);
       } catch (err: unknown) {
@@ -58,6 +60,7 @@ export default function Home() {
         setApiResponse(null);
         setSnappedRoute(null);
         setEdgeBreakPoints(null);
+        setEdgeOffsets([]);
         setEdgeMidPoints([]);
         setEdgeInfoList([]);
       } finally {
@@ -95,6 +98,7 @@ export default function Home() {
     setPoints([]);
     setSnappedRoute(null);
     setEdgeBreakPoints(null);
+    setEdgeOffsets([]);
     setEdgeMidPoints([]);
     setEdgeInfoList([]);
     setSelectedEdgeIndex(null);
@@ -118,6 +122,7 @@ export default function Home() {
         } else {
           setSnappedRoute(null);
           setEdgeBreakPoints(null);
+          setEdgeOffsets([]);
           setEdgeMidPoints([]);
           setEdgeInfoList([]);
           setSelectedEdgeIndex(null);
@@ -163,6 +168,7 @@ export default function Home() {
               points={points}
               snappedRoute={snappedRoute}
               edgeBreakPoints={edgeBreakPoints}
+              edgeOffsets={edgeOffsets}
               edgeMidPoints={edgeMidPoints}
               selectedEdgeIndex={selectedEdgeIndex}
               onMapClick={handleMapClick}

@@ -10,6 +10,7 @@ export async function fetchSnapToRoad(
   response: SnapToRoadResponse;
   decodedRoute: [number, number][];
   edgeBreakPoints: [number, number][];
+  edgeOffsets: number[];
   edgeMidPoints: [number, number][];
   edgeInfoList: EdgeInfo[];
 }> {
@@ -72,5 +73,5 @@ export async function fetchSnapToRoad(
     return decodedRoute[midIdx];
   });
 
-  return { requestUrl, response: data, decodedRoute, edgeBreakPoints, edgeMidPoints, edgeInfoList };
+  return { requestUrl, response: data, decodedRoute, edgeBreakPoints, edgeOffsets: offsets, edgeMidPoints, edgeInfoList };
 }
