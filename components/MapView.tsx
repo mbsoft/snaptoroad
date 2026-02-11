@@ -5,6 +5,11 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapPoint } from '@/lib/types';
 
+const PRIMARY_STYLE = (key: string) =>
+  `https://api.nextbillion.io/orbis/style/0.4.4-0/style.json?apiVersion=1&&map=basic_street-light&key=${key}`;
+const FALLBACK_STYLE = (key: string) =>
+  `https://api.nextbillion.io/maps/streets/style.json?key=${key}`;
+
 const ROUTE_SOURCE = 'snapped-route';
 const ROUTE_LAYER = 'snapped-route-line';
 const EDGE_SEGMENTS_SOURCE = 'edge-segments';
@@ -64,9 +69,11 @@ export default function MapView({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
+    let usedFallback = false;
+
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: `https://api.nextbillion.io/orbis/style/0.4.4-0/style.json?apiVersion=1&&map=basic_street-light&key=${apiKey}`,
+      style: PRIMARY_STYLE(apiKey),
       center: [-87.6298, 41.8781],
       zoom: 12,
     });
@@ -75,6 +82,14 @@ export default function MapView({
 
     map.on('load', () => {
       mapLoadedRef.current = true;
+    });
+
+    // Switch to fallback style if tile loading errors occur
+    map.on('error', (e) => {
+      if (!usedFallback && e.error?.status >= 400) {
+        usedFallback = true;
+        map.setStyle(FALLBACK_STYLE(apiKey));
+      }
     });
 
     map.on('click', (e: maplibregl.MapMouseEvent) => {
