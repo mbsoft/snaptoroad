@@ -1,14 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { RequestType, ApiEndpoint, API_ENDPOINTS } from '@/lib/types';
 
 const STORAGE_KEY = 'nbai_api_key';
 
 interface ApiKeyInputProps {
   onSubmit: (key: string) => void;
+  requestType: RequestType;
+  onRequestTypeChange: (type: RequestType) => void;
+  endpoint: ApiEndpoint;
+  onEndpointChange: (endpoint: ApiEndpoint) => void;
+  debug: boolean;
+  onDebugChange: (debug: boolean) => void;
 }
 
-export default function ApiKeyInput({ onSubmit }: ApiKeyInputProps) {
+export default function ApiKeyInput({ onSubmit, requestType, onRequestTypeChange, endpoint, onEndpointChange, debug, onDebugChange }: ApiKeyInputProps) {
   const [value, setValue] = useState('');
   const [isSet, setIsSet] = useState(false);
 
@@ -41,7 +48,7 @@ export default function ApiKeyInput({ onSubmit }: ApiKeyInputProps) {
 
   return (
     <div className="api-key-bar">
-      <label>NB.AI API Key</label>
+      <label>API Key</label>
       <input
         type="password"
         value={value}
@@ -61,6 +68,32 @@ export default function ApiKeyInput({ onSubmit }: ApiKeyInputProps) {
         </button>
       )}
       {isSet && <span className="status">Key set</span>}
+      <select
+        value={endpoint}
+        onChange={(e) => onEndpointChange(e.target.value as ApiEndpoint)}
+        title="API endpoint"
+      >
+        {API_ENDPOINTS.map((ep) => (
+          <option key={ep.value} value={ep.value}>{ep.label}</option>
+        ))}
+      </select>
+      <select
+        value={requestType}
+        onChange={(e) => onRequestTypeChange(e.target.value as RequestType)}
+        title="Request type"
+      >
+        <option value="directions">Directions</option>
+        <option value="snap2road">Snap to Road</option>
+        <option value="navigation">Navigation</option>
+      </select>
+      <label className="debug-checkbox">
+        <input
+          type="checkbox"
+          checked={debug}
+          onChange={(e) => onDebugChange(e.target.checked)}
+        />
+        Debug
+      </label>
     </div>
   );
 }

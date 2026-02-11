@@ -67,7 +67,7 @@ export default function MapView({
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: `https://api.nextbillion.io/orbis/style/0.4.4-0/style.json?apiVersion=1&&map=basic_street-light&key=${apiKey}`,
-      center: [-118.2437, 34.0522],
+      center: [-87.6298, 41.8781],
       zoom: 12,
     });
 
@@ -94,7 +94,6 @@ export default function MapView({
     });
 
     map.on('mouseleave', EDGE_SEGMENTS_LAYER, () => {
-      onEdgeSelectRef.current(null);
       map.getCanvas().style.cursor = '';
     });
 
