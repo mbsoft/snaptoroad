@@ -23,6 +23,21 @@ body {
   border-bottom: 1px solid #333;
 }
 
+.api-key-bar select {
+  padding: 6px 10px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: #2a2a3e;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.api-key-bar select:focus {
+  outline: none;
+  border-color: #4a90d9;
+}
+
 .api-key-bar label {
   color: #aaa;
   font-size: 13px;
@@ -76,6 +91,21 @@ body {
 .api-key-bar .status {
   font-size: 12px;
   color: #6cbf6c;
+}
+
+.api-key-bar .debug-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.api-key-bar .debug-checkbox input {
+  flex: none;
+  max-width: none;
+  width: auto;
+  margin: 0;
+  cursor: pointer;
 }
 
 /* Main Layout */
@@ -221,6 +251,11 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.point-card .point-coords .snap-detail {
+  color: #888;
+  font-family: inherit;
 }
 
 .point-card .point-remove {
@@ -602,4 +637,227 @@ body {
   text-align: right;
   word-break: break-all;
   min-width: 0;
+}
+
+/* Navigation Legs Panel */
+.nav-legs-section {
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-legs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #e8f5e9;
+  border-bottom: 1px solid #c8e6c9;
+  flex-shrink: 0;
+}
+
+.nav-legs-header h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2e7d32;
+}
+
+.nav-legs-summary {
+  font-size: 12px;
+  color: #555;
+  font-weight: 500;
+}
+
+.nav-legs-body {
+  padding: 6px 8px;
+}
+
+.nav-leg-card {
+  margin-bottom: 4px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.nav-leg-toggle {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.nav-leg-toggle:hover {
+  background: #eeeeee;
+}
+
+.nav-leg-arrow {
+  color: #555;
+  font-size: 14px;
+  width: 16px;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.nav-leg-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-leg-meta {
+  flex: 1;
+  color: #666;
+  font-size: 11px;
+}
+
+.nav-leg-steps {
+  border-top: 1px solid #eee;
+}
+
+.nav-step-card {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.nav-step-card:last-child {
+  border-bottom: none;
+}
+
+.nav-step-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.nav-step-main:hover {
+  background: #fafafa;
+}
+
+.nav-step-index {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #4a90d9;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.nav-step-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-step-instruction {
+  display: block;
+  font-size: 12px;
+  color: #333;
+  line-height: 1.3;
+}
+
+.nav-step-meta {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.nav-step-road {
+  color: #666;
+}
+
+.nav-step-expand {
+  color: #666;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+  width: 16px;
+  text-align: center;
+}
+
+.nav-step-details {
+  padding: 6px 10px 8px 40px;
+  background: #f9f9f9;
+  border-top: 1px solid #f0f0f0;
+}
+
+.nav-step-group {
+  margin: 4px 0;
+}
+
+.nav-step-group-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #555;
+  padding: 3px 0 2px;
+}
+
+.nav-step-field {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.nav-step-field:hover {
+  background: #f0f0f0;
+}
+
+.nav-step-field-label {
+  color: #888;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.nav-step-field-value {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 11px;
+  color: #333;
+  text-align: right;
+  word-break: break-all;
+  min-width: 0;
+}
+
+.nav-intersection {
+  margin-left: 6px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 8px;
+  margin-bottom: 2px;
+}
+
+.nav-intersection-toggle {
+  all: unset;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-weight: 500;
+}
+
+.nav-intersection-toggle:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.nav-intersection-body {
+  padding: 2px 0 4px;
 }
