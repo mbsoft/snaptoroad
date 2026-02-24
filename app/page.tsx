@@ -26,6 +26,7 @@ export default function Home() {
   const [apiRequestUrl, setApiRequestUrl] = useState<string | null>(null);
   const [apiResponse, setApiResponse] = useState<object | null>(null);
   const [debug, setDebug] = useState(false);
+  const [allowTaxi, setAllowTaxi] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,10 +34,11 @@ export default function Home() {
   const abortRef = useRef<AbortController | null>(null);
 
   const callApi = useCallback(
-    async (pts: MapPoint[], type?: RequestType, ep?: ApiEndpoint, dbg?: boolean) => {
+    async (pts: MapPoint[], type?: RequestType, ep?: ApiEndpoint, dbg?: boolean, taxi?: boolean) => {
       const rt = type ?? requestType;
       const base = ep ?? endpoint;
       const dbgFlag = dbg ?? debug;
+      const taxiFlag = taxi ?? allowTaxi;
       if (pts.length < 2 || !apiKey) return;
 
       // Cancel any in-flight request
@@ -55,6 +57,7 @@ export default function Home() {
           apiKey,
           base,
           dbgFlag,
+          taxiFlag,
           controller.signal
         );
         setApiRequestUrl(requestUrl);
@@ -82,7 +85,7 @@ export default function Home() {
         setIsLoading(false);
       }
     },
-    [apiKey, requestType, endpoint, debug]
+    [apiKey, requestType, endpoint, debug, allowTaxi]
   );
 
   const handleApiKeySubmit = useCallback((key: string) => {
@@ -114,6 +117,16 @@ export default function Home() {
       setDebug(dbg);
       if (points.length >= 2 && apiKey) {
         callApi(points, undefined, undefined, dbg);
+      }
+    },
+    [points, apiKey, callApi]
+  );
+
+  const handleAllowTaxiChange = useCallback(
+    (taxi: boolean) => {
+      setAllowTaxi(taxi);
+      if (points.length >= 2 && apiKey) {
+        callApi(points, undefined, undefined, undefined, taxi);
       }
     },
     [points, apiKey, callApi]
@@ -216,6 +229,8 @@ export default function Home() {
         onEndpointChange={handleEndpointChange}
         debug={debug}
         onDebugChange={handleDebugChange}
+        allowTaxi={allowTaxi}
+        onAllowTaxiChange={handleAllowTaxiChange}
       />
       <div className="main-content">
         <div className="left-column">

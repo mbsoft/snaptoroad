@@ -1,0 +1,6 @@
+project_id    = "your-gcp-project-id"
+region        = "us-central1"
+service_name  = "snaptoroad"
+image         = "us-central1-docker.pkg.dev/your-project/your-repo/snaptoroad:latest"
+max_instances = 3
+min_instances = 0

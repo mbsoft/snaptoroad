@@ -13,9 +13,11 @@ interface ApiKeyInputProps {
   onEndpointChange: (endpoint: ApiEndpoint) => void;
   debug: boolean;
   onDebugChange: (debug: boolean) => void;
+  allowTaxi: boolean;
+  onAllowTaxiChange: (allowTaxi: boolean) => void;
 }
 
-export default function ApiKeyInput({ onSubmit, requestType, onRequestTypeChange, endpoint, onEndpointChange, debug, onDebugChange }: ApiKeyInputProps) {
+export default function ApiKeyInput({ onSubmit, requestType, onRequestTypeChange, endpoint, onEndpointChange, debug, onDebugChange, allowTaxi, onAllowTaxiChange }: ApiKeyInputProps) {
   const [value, setValue] = useState('');
   const [isSet, setIsSet] = useState(false);
 
@@ -93,6 +95,14 @@ export default function ApiKeyInput({ onSubmit, requestType, onRequestTypeChange
           onChange={(e) => onDebugChange(e.target.checked)}
         />
         Debug
+      </label>
+      <label className="debug-checkbox">
+        <input
+          type="checkbox"
+          checked={allowTaxi}
+          onChange={(e) => onAllowTaxiChange(e.target.checked)}
+        />
+        Taxis
       </label>
     </div>
   );

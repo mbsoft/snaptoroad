@@ -9,15 +9,16 @@ export async function fetchApi(
   apiKey: string,
   baseUrl: ApiEndpoint,
   debug: boolean,
+  allowTaxi: boolean,
   signal?: AbortSignal
 ): Promise<ApiResult> {
   switch (requestType) {
     case 'snap2road':
-      return fetchSnap(points, apiKey, baseUrl, debug, signal);
+      return fetchSnap(points, apiKey, baseUrl, debug, allowTaxi, signal);
     case 'directions':
-      return fetchDirectionsOrNav('directions', points, apiKey, baseUrl, debug, signal);
+      return fetchDirectionsOrNav('directions', points, apiKey, baseUrl, debug, allowTaxi, signal);
     case 'navigation':
-      return fetchDirectionsOrNav('navigation', points, apiKey, baseUrl, debug, signal);
+      return fetchDirectionsOrNav('navigation', points, apiKey, baseUrl, debug, allowTaxi, signal);
   }
 }
 
@@ -101,6 +102,7 @@ async function fetchSnap(
   apiKey: string,
   baseUrl: ApiEndpoint,
   debug: boolean,
+  allowTaxi: boolean,
   signal?: AbortSignal
 ): Promise<ApiResult> {
   const path = points.map((p) => `${p.lat},${p.lng}`).join('|');
@@ -115,6 +117,9 @@ async function fetchSnap(
   url.searchParams.set('option', 'flexible');
   url.searchParams.set('road_info', 'way_id|max_speed');
   url.searchParams.set('detail', 'true');
+  if (allowTaxi) {
+    url.searchParams.set('allow', 'taxi');
+  }
   if (debug) {
     url.searchParams.set('debug', 'true');
   }
@@ -165,6 +170,7 @@ async function fetchDirectionsOrNav(
   apiKey: string,
   baseUrl: ApiEndpoint,
   debug: boolean,
+  allowTaxi: boolean,
   signal?: AbortSignal
 ): Promise<ApiResult> {
   const endpoint = type === 'directions'
@@ -184,6 +190,9 @@ async function fetchDirectionsOrNav(
   }
 
   url.searchParams.set('mode', 'car');
+  if (allowTaxi) {
+    url.searchParams.set('allow', 'taxi');
+  }
   url.searchParams.set('key', apiKey);
   if (type === 'directions') {
     url.searchParams.set('option', 'flexible');
